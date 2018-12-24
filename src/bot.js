@@ -2,8 +2,10 @@ import { Client } from 'discord.js';
 import dotenv from 'dotenv';
 import { prefix, commands } from './constants';
 import { addQueryServer, queryUT99Server, delQueryServer } from './ut99query';
+import { addGameType } from './pug';
 import { printServerStatus, printServerList } from './formats';
 import { checkIfRoleIsPrivileged } from './helpers';
+import { createSortedArrayFromObject } from './util';
 import API from './api';
 
 dotenv.config();
@@ -25,8 +27,9 @@ bot.on('message', async message => {
 
   switch (true) {
     case commands.servers.includes(action): {
-      const { Servers } = cachedDB;
-      console.log(Servers);
+      const { Servers: serversObj = {} } = cachedDB;
+      const Servers = createSortedArrayFromObject(serversObj, 'timestamp');
+
       message.channel
         .send(printServerList(Servers))
         .catch(console.error + ':list:');
@@ -35,7 +38,8 @@ bot.on('message', async message => {
 
     case checkIfRoleIsPrivileged(roles) &&
       commands.addqueryserver.includes(action): {
-      const { Servers } = cachedDB;
+      const { Servers: serversObj = {} } = cachedDB;
+      const Servers = createSortedArrayFromObject(serversObj);
 
       const result = await addQueryServer(args, Servers);
       result.status ? updateCache('Servers', result.cache) : '';
@@ -45,7 +49,9 @@ bot.on('message', async message => {
 
     case checkIfRoleIsPrivileged(roles) &&
       commands.delqueryserver.includes(action): {
-      const { Servers } = cachedDB;
+      const { Servers: serversObj = {} } = cachedDB;
+      const Servers = createSortedArrayFromObject(serversObj);
+
       const result = await delQueryServer(args, Servers);
       result.status ? updateCache('Servers', result.cache) : '';
       message.channel.send(result.msg);
@@ -57,7 +63,9 @@ bot.on('message', async message => {
       break;
 
     case commands.queryut99server.includes(action): {
-      const { Servers } = cachedDB;
+      const { Servers: serversObj = {} } = cachedDB;
+      const Servers = createSortedArrayFromObject(serversObj, 'timestamp');
+
       const result = await queryUT99Server(args[1], Servers);
       message.channel
         .send(result.status ? printServerStatus(result) : result.msg)
@@ -66,6 +74,12 @@ bot.on('message', async message => {
     }
 
     case commands.addgametype.includes(action): {
+      const { Pugs = {} } = cachedDB;
+
+      const result = await addGameType(args, Pugs);
+      result.status ? updateCache('Pugs', result.cache) : '';
+      message.channel.send(result.msg);
+      break;
     }
 
     default:
@@ -75,7 +89,6 @@ bot.on('message', async message => {
 
 (async () => {
   cachedDB = await API.getCopyOfDB(`/`);
-  console.log(cachedDB);
   bot.login(process.env.DISCORD_BOT_TOKEN);
 })();
 

@@ -31,7 +31,7 @@ export const addQueryServer = async ([_, hp, ...args], cachedDB) => {
     const newServer = { host, port, name, aliases, timestamp: Date.now() };
 
     const result = await API.pushToDB('/Servers', uid, newServer);
-    return result;
+    return { ...result, msg: 'Query server added' };
   } catch (error) {
     console.log(error);
     return { status: false, msg: 'Something went wrong' };
@@ -44,7 +44,7 @@ export const delQueryServer = async ([_, index, ...args], cachedDB) => {
     if (!uid) return { status: false, msg: `Query server doesn't exist` };
 
     const result = await API.deleteFromDB('/Servers', uid);
-    return result;
+    return { ...result, msg: 'Query server removed' };
   } catch (error) {
     console.log(error);
     return { status: false, msg: 'Something went wrong' };

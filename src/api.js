@@ -1,6 +1,5 @@
 import dgram from 'dgram';
 import db from './db';
-import util from 'util';
 import {
   checkIfFinalPacket,
   createSortedDBSnapshot,
@@ -43,7 +42,7 @@ export default class API {
     try {
       await db.ref(`${collection}/${id}`).set(payload);
       const cache = await API.getCopyOfDB(collection);
-      return { status: true, cache, msg: 'Query server added' };
+      return { status: true, cache };
     } catch (error) {
       console.log('pushToDB Error ', e);
       return { status: false, msg: 'Something went wrong' };
@@ -54,7 +53,7 @@ export default class API {
     try {
       await db.ref(`${collection}/${id}`).remove();
       const cache = await API.getCopyOfDB(collection);
-      return { status: true, cache, msg: 'Query server removed' };
+      return { status: true, cache };
     } catch (error) {
       console.log('deleteFromDB Error ', e);
       return { status: false, msg: 'Something went wrong' };

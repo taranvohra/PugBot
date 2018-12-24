@@ -5,10 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.queryUT99Server = exports.updateQueryServer = exports.delQueryServer = exports.addQueryServer = undefined;
 
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
 var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
 
 var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
@@ -16,6 +12,10 @@ var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
 
 var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
 
@@ -87,7 +87,7 @@ var addQueryServer = exports.addQueryServer = function () {
 
           case 11:
             result = _context.sent;
-            return _context.abrupt('return', result);
+            return _context.abrupt('return', (0, _extends3.default)({}, result, { msg: 'Query server added' }));
 
           case 15:
             _context.prev = 15;
@@ -137,7 +137,7 @@ var delQueryServer = exports.delQueryServer = function () {
 
           case 6:
             result = _context2.sent;
-            return _context2.abrupt('return', result);
+            return _context2.abrupt('return', (0, _extends3.default)({}, result, { msg: 'Query server removed' }));
 
           case 10:
             _context2.prev = 10;

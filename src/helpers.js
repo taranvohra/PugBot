@@ -121,6 +121,26 @@ export const getTeamScores = (info, maxTeams) => {
   return teamScores;
 };
 
+/**
+ * @param {Number} noOfPlayers
+ * @param {Number} noOfTeams
+ * @description Obtains the picking order for pug. Returns 0 if invalid props
+ */
+export const getPickingOrder = (noPlayers, noTeams) => {
+  if (noPlayers < noTeams || noPlayers % noTeams !== 0) return 0;
+  const pickingOrder = [];
+  let idx = 0;
+  let shouldSwitch = -1;
+  let remainingPlayers = noPlayers - noTeams; // because captainsss
+  while (remainingPlayers > 0) {
+    pickingOrder.push(idx);
+    shouldSwitch = (shouldSwitch + 1) % 2;
+    idx = shouldSwitch === 0 ? (idx + 1) % noTeams : idx;
+    remainingPlayers--;
+  }
+  return pickingOrder;
+};
+
 const fixSpecialCharactersInName = name =>
   name.replace(/(\*|`|:)/g, c => '\\' + c);
 

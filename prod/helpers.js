@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getTeamIndex = exports.getMinutesAndSeconds = exports.padNumberWithZero = exports.getTeamScores = exports.getPlayerList = exports.checkIfRoleIsPrivileged = exports.createCacheFromSnapshot = exports.getUIDFromIndex = exports.getHostAndPortOfServerFromDB = exports.checkKeyExistenceFromIndex = exports.createObjectFromArray = exports.filterFalsyValues = exports.checkIfFinalPacket = undefined;
+exports.getTeamIndex = exports.getMinutesAndSeconds = exports.padNumberWithZero = exports.getPickingOrder = exports.getTeamScores = exports.getPlayerList = exports.checkIfRoleIsPrivileged = exports.createCacheFromSnapshot = exports.getUIDFromIndex = exports.getHostAndPortOfServerFromDB = exports.checkKeyExistenceFromIndex = exports.createObjectFromArray = exports.filterFalsyValues = exports.checkIfFinalPacket = undefined;
 
 var _values = require('babel-runtime/core-js/object/values');
 
@@ -134,6 +134,29 @@ var getTeamScores = exports.getTeamScores = function getTeamScores(info, maxTeam
     teamScores[(0, _values2.default)(_constants.teams)[i]] = info['teamscore_' + i];
   }
   return teamScores;
+};
+
+/**
+ * @param {Number} noOfPlayers
+ * @param {Number} noOfTeams
+ * @description Obtains the picking order for pug. Returns 0 if invalid props
+ */
+var getPickingOrder = exports.getPickingOrder = function getPickingOrder(noPlayers, noTeams) {
+  console.log(noPlayers, noTeams);
+  console.log(noPlayers < noTeams || noPlayers % noTeams !== 0);
+  if (noPlayers < noTeams || noPlayers % noTeams !== 0) return 0;
+  console.log('haaa');
+  var pickingOrder = [];
+  var idx = 0;
+  var shouldSwitch = -1;
+  var remainingPlayers = noPlayers - noTeams; // because captainsss
+  while (remainingPlayers > 0) {
+    pickingOrder.push(idx);
+    shouldSwitch = (shouldSwitch + 1) % 2;
+    idx = shouldSwitch === 0 ? (idx + 1) % noTeams : idx;
+    remainingPlayers--;
+  }
+  return pickingOrder;
 };
 
 var fixSpecialCharactersInName = function fixSpecialCharactersInName(name) {
