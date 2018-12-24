@@ -83,7 +83,7 @@ var addQueryServer = exports.addQueryServer = function () {
           case 8:
             newServer = { host: host, port: port, name: name, aliases: aliases, timestamp: Date.now() };
             _context.next = 11;
-            return _api2.default.pushToDB(uid, newServer);
+            return _api2.default.pushToDB('/Servers', uid, newServer);
 
           case 11:
             result = _context.sent;
@@ -133,7 +133,7 @@ var delQueryServer = exports.delQueryServer = function () {
 
           case 4:
             _context2.next = 6;
-            return _api2.default.deleteFromDB(uid);
+            return _api2.default.deleteFromDB('/Servers', uid);
 
           case 6:
             result = _context2.sent;

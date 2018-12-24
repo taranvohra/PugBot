@@ -79,18 +79,18 @@ var API = function () {
   }, {
     key: 'getCopyOfDB',
     value: function () {
-      var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+      var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(collection) {
         var snapshot;
         return _regenerator2.default.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return _db2.default.ref('/Servers').orderByChild('timestamp').once('value');
+                return _db2.default.ref('' + collection).once('value');
 
               case 2:
                 snapshot = _context.sent;
-                return _context.abrupt('return', (0, _helpers.createSortedDBSnapshot)(snapshot));
+                return _context.abrupt('return', (0, _helpers.createCacheFromSnapshot)(snapshot));
 
               case 4:
               case 'end':
@@ -100,7 +100,7 @@ var API = function () {
         }, _callee, this);
       }));
 
-      function getCopyOfDB() {
+      function getCopyOfDB(_x) {
         return _ref.apply(this, arguments);
       }
 
@@ -109,7 +109,7 @@ var API = function () {
   }, {
     key: 'pushToDB',
     value: function () {
-      var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(id, payload) {
+      var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(collection, id, payload) {
         var cache;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
           while (1) {
@@ -117,11 +117,11 @@ var API = function () {
               case 0:
                 _context2.prev = 0;
                 _context2.next = 3;
-                return _db2.default.ref('/Servers/' + id).set(payload);
+                return _db2.default.ref(collection + '/' + id).set(payload);
 
               case 3:
                 _context2.next = 5;
-                return API.getCopyOfDB();
+                return API.getCopyOfDB(collection);
 
               case 5:
                 cache = _context2.sent;
@@ -142,7 +142,7 @@ var API = function () {
         }, _callee2, this, [[0, 9]]);
       }));
 
-      function pushToDB(_x, _x2) {
+      function pushToDB(_x2, _x3, _x4) {
         return _ref2.apply(this, arguments);
       }
 
@@ -151,7 +151,7 @@ var API = function () {
   }, {
     key: 'deleteFromDB',
     value: function () {
-      var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(id) {
+      var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(collection, id) {
         var cache;
         return _regenerator2.default.wrap(function _callee3$(_context3) {
           while (1) {
@@ -159,11 +159,11 @@ var API = function () {
               case 0:
                 _context3.prev = 0;
                 _context3.next = 3;
-                return _db2.default.ref('/Servers/' + id).remove();
+                return _db2.default.ref(collection + '/' + id).remove();
 
               case 3:
                 _context3.next = 5;
-                return API.getCopyOfDB();
+                return API.getCopyOfDB(collection);
 
               case 5:
                 cache = _context3.sent;
@@ -184,7 +184,7 @@ var API = function () {
         }, _callee3, this, [[0, 9]]);
       }));
 
-      function deleteFromDB(_x3) {
+      function deleteFromDB(_x5, _x6) {
         return _ref3.apply(this, arguments);
       }
 

@@ -1,7 +1,11 @@
 import dgram from 'dgram';
 import db from './db';
 import util from 'util';
-import { checkIfFinalPacket, createSortedDBSnapshot } from './helpers';
+import {
+  checkIfFinalPacket,
+  createSortedDBSnapshot,
+  createCacheFromSnapshot,
+} from './helpers';
 
 export default class API {
   static getUT99ServerStatus(host, port) {
@@ -30,18 +34,15 @@ export default class API {
     });
   }
 
-  static async getCopyOfDB() {
-    const snapshot = await db
-      .ref('/Servers')
-      .orderByChild('timestamp')
-      .once('value');
-    return createSortedDBSnapshot(snapshot);
+  static async getCopyOfDB(collection) {
+    const snapshot = await db.ref(`${collection}`).once('value');
+    return createCacheFromSnapshot(snapshot);
   }
 
-  static async pushToDB(id, payload) {
+  static async pushToDB(collection, id, payload) {
     try {
-      await db.ref(`/Servers/${id}`).set(payload);
-      const cache = await API.getCopyOfDB();
+      await db.ref(`${collection}/${id}`).set(payload);
+      const cache = await API.getCopyOfDB(collection);
       return { status: true, cache, msg: 'Query server added' };
     } catch (error) {
       console.log('pushToDB Error ', e);
@@ -49,10 +50,10 @@ export default class API {
     }
   }
 
-  static async deleteFromDB(id) {
+  static async deleteFromDB(collection, id) {
     try {
-      await db.ref(`/Servers/${id}`).remove();
-      const cache = await API.getCopyOfDB();
+      await db.ref(`${collection}/${id}`).remove();
+      const cache = await API.getCopyOfDB(collection);
       return { status: true, cache, msg: 'Query server removed' };
     } catch (error) {
       console.log('deleteFromDB Error ', e);

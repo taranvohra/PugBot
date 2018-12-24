@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getTeamIndex = exports.getMinutesAndSeconds = exports.padNumberWithZero = exports.getTeamScores = exports.getPlayerList = exports.checkIfRoleIsPrivileged = exports.createSortedDBSnapshot = exports.getUIDFromIndex = exports.getHostAndPortOfServerFromDB = exports.checkKeyExistenceFromIndex = exports.createObjectFromArray = exports.filterFalsyValues = exports.checkIfFinalPacket = undefined;
+exports.getTeamIndex = exports.getMinutesAndSeconds = exports.padNumberWithZero = exports.getTeamScores = exports.getPlayerList = exports.checkIfRoleIsPrivileged = exports.createCacheFromSnapshot = exports.getUIDFromIndex = exports.getHostAndPortOfServerFromDB = exports.checkKeyExistenceFromIndex = exports.createObjectFromArray = exports.filterFalsyValues = exports.checkIfFinalPacket = undefined;
 
 var _values = require('babel-runtime/core-js/object/values');
 
@@ -12,10 +12,6 @@ var _values2 = _interopRequireDefault(_values);
 var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
-
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
 
 var _constants = require('./constants');
 
@@ -84,14 +80,14 @@ var getUIDFromIndex = exports.getUIDFromIndex = function getUIDFromIndex(cachedD
 
 /**
  * @param {Object} snapshot
- * @description returns a cache of sorted servers
+ * @description returns a cache of database from firebase
  */
-var createSortedDBSnapshot = exports.createSortedDBSnapshot = function createSortedDBSnapshot(snapshot) {
-  var sortedSnapshot = [];
+var createCacheFromSnapshot = exports.createCacheFromSnapshot = function createCacheFromSnapshot(snapshot) {
+  var cache = {};
   snapshot.forEach(function (child) {
-    sortedSnapshot.push((0, _extends3.default)({ id: child.key }, child.val()));
+    cache[child.key] = child.val();
   });
-  return sortedSnapshot;
+  return cache;
 };
 
 var checkIfRoleIsPrivileged = exports.checkIfRoleIsPrivileged = function checkIfRoleIsPrivileged(roles) {
@@ -113,7 +109,7 @@ var getPlayerList = exports.getPlayerList = function getPlayerList(players, noOf
   var playerList = (_playerList = {}, (0, _defineProperty3.default)(_playerList, _constants.teams.team_0, []), (0, _defineProperty3.default)(_playerList, _constants.teams.team_1, []), (0, _defineProperty3.default)(_playerList, _constants.teams.team_2, []), (0, _defineProperty3.default)(_playerList, _constants.teams.team_3, []), (0, _defineProperty3.default)(_playerList, _constants.teams.team_255, []), (0, _defineProperty3.default)(_playerList, _constants.teams.spec, []), _playerList);
 
   for (var i = 0; i < noOfPlayers; i++) {
-    var cFlag = !!players['countryc_' + i] && players['countryc_' + i] ? ':flag_' + players['countryc_' + i] + ':' : ':flag_white:';
+    var cFlag = !!players['countryc_' + i] && players['countryc_' + i] !== 'none' ? ':flag_' + players['countryc_' + i] + ':' : ':flag_white:';
 
     var playerName = cFlag + ' ' + fixSpecialCharactersInName(players['player_' + i]);
     if (players['mesh_' + i] === 'Spectator') {

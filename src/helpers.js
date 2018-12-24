@@ -58,14 +58,14 @@ export const getUIDFromIndex = (cachedDB, index) =>
 
 /**
  * @param {Object} snapshot
- * @description returns a cache of sorted servers
+ * @description returns a cache of database from firebase
  */
-export const createSortedDBSnapshot = snapshot => {
-  let sortedSnapshot = [];
+export const createCacheFromSnapshot = snapshot => {
+  let cache = {};
   snapshot.forEach(child => {
-    sortedSnapshot.push({ id: child.key, ...child.val() });
+    cache[child.key] = child.val();
   });
-  return sortedSnapshot;
+  return cache;
 };
 
 export const checkIfRoleIsPrivileged = roles =>

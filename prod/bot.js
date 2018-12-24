@@ -39,7 +39,7 @@ bot.on('ready', function () {
 
 bot.on('message', function () {
   var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(message) {
-    var args, roles, result, _result, _result2;
+    var args, action, roles, _cachedDB, Servers, _cachedDB2, _Servers, result, _cachedDB3, _Servers2, _result, _cachedDB4, _Servers3, _result2;
 
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
@@ -62,55 +62,62 @@ bot.on('message', function () {
 
           case 4:
             args = message.content.substring(_constants.prefix.length).split(' ');
+            action = args[0].toLowerCase();
             roles = message.member.roles;
-            _context.t0 = args[0];
-            _context.next = _context.t0 === _constants.commands.servers ? 9 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.addqueryserver) ? 11 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.delqueryserver) ? 17 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.updatequeryserver) ? 23 : _context.t0 === _constants.commands.queryut99server ? 25 : 30;
+            _context.t0 = true;
+            _context.next = _context.t0 === _constants.commands.servers.includes(action) ? 10 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.addqueryserver.includes(action)) ? 14 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.delqueryserver.includes(action)) ? 21 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.updatequeryserver) ? 28 : _context.t0 === _constants.commands.queryut99server.includes(action) ? 30 : _context.t0 === _constants.commands.addgametype.includes(action) ? 36 : 36;
             break;
 
-          case 9:
-            message.channel.send((0, _formats.printServerList)(cachedDB)).catch(console.error + ':list:');
-            return _context.abrupt('break', 31);
+          case 10:
+            _cachedDB = cachedDB, Servers = _cachedDB.Servers;
 
-          case 11:
-            _context.next = 13;
-            return (0, _ut99query.addQueryServer)(args, cachedDB);
+            console.log(Servers);
+            message.channel.send((0, _formats.printServerList)(Servers)).catch(console.error + ':list:');
+            return _context.abrupt('break', 37);
 
-          case 13:
-            result = _context.sent;
-
-            result.status ? updateCache(result.cache) : '';
-            message.channel.send(result.msg);
-            return _context.abrupt('break', 31);
+          case 14:
+            _cachedDB2 = cachedDB, _Servers = _cachedDB2.Servers;
+            _context.next = 17;
+            return (0, _ut99query.addQueryServer)(args, _Servers);
 
           case 17:
-            _context.next = 19;
-            return (0, _ut99query.delQueryServer)(args, cachedDB);
+            result = _context.sent;
 
-          case 19:
+            result.status ? updateCache('Servers', result.cache) : '';
+            message.channel.send(result.msg);
+            return _context.abrupt('break', 37);
+
+          case 21:
+            _cachedDB3 = cachedDB, _Servers2 = _cachedDB3.Servers;
+            _context.next = 24;
+            return (0, _ut99query.delQueryServer)(args, _Servers2);
+
+          case 24:
             _result = _context.sent;
 
-            _result.status ? updateCache(_result.cache) : '';
+            _result.status ? updateCache('Servers', _result.cache) : '';
             message.channel.send(_result.msg);
-            return _context.abrupt('break', 31);
+            return _context.abrupt('break', 37);
 
-          case 23:
+          case 28:
             console.log(args[0]);
-            return _context.abrupt('break', 31);
+            return _context.abrupt('break', 37);
 
-          case 25:
-            _context.next = 27;
-            return (0, _ut99query.queryUT99Server)(args[1], cachedDB);
+          case 30:
+            _cachedDB4 = cachedDB, _Servers3 = _cachedDB4.Servers;
+            _context.next = 33;
+            return (0, _ut99query.queryUT99Server)(args[1], _Servers3);
 
-          case 27:
+          case 33:
             _result2 = _context.sent;
 
             message.channel.send(_result2.status ? (0, _formats.printServerStatus)(_result2) : _result2.msg).catch(console.error + ':query:');
-            return _context.abrupt('break', 31);
+            return _context.abrupt('break', 37);
 
-          case 30:
+          case 36:
             console.log('no match');
 
-          case 31:
+          case 37:
           case 'end':
             return _context.stop();
         }
@@ -129,14 +136,15 @@ bot.on('message', function () {
       switch (_context2.prev = _context2.next) {
         case 0:
           _context2.next = 2;
-          return _api2.default.getCopyOfDB();
+          return _api2.default.getCopyOfDB('/');
 
         case 2:
           cachedDB = _context2.sent;
 
+          console.log(cachedDB);
           bot.login(process.env.DISCORD_BOT_TOKEN);
 
-        case 4:
+        case 5:
         case 'end':
           return _context2.stop();
       }
@@ -144,6 +152,6 @@ bot.on('message', function () {
   }, _callee2, undefined);
 }))();
 
-var updateCache = function updateCache(newCache) {
-  return cachedDB = newCache;
+var updateCache = function updateCache(toUpdate, newCache) {
+  return cachedDB[toUpdate] = newCache;
 };

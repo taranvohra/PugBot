@@ -20,26 +20,34 @@ bot.on('message', async message => {
   if (!message.content.startsWith(prefix)) return;
 
   const args = message.content.substring(prefix.length).split(' ');
+  const action = args[0].toLowerCase();
   const roles = message.member.roles;
 
-  switch (args[0]) {
-    case commands.servers: {
+  switch (true) {
+    case commands.servers.includes(action): {
+      const { Servers } = cachedDB;
+      console.log(Servers);
       message.channel
-        .send(printServerList(cachedDB))
+        .send(printServerList(Servers))
         .catch(console.error + ':list:');
       break;
     }
 
-    case checkIfRoleIsPrivileged(roles) && commands.addqueryserver: {
-      const result = await addQueryServer(args, cachedDB);
-      result.status ? updateCache(result.cache) : '';
+    case checkIfRoleIsPrivileged(roles) &&
+      commands.addqueryserver.includes(action): {
+      const { Servers } = cachedDB;
+
+      const result = await addQueryServer(args, Servers);
+      result.status ? updateCache('Servers', result.cache) : '';
       message.channel.send(result.msg);
       break;
     }
 
-    case checkIfRoleIsPrivileged(roles) && commands.delqueryserver: {
-      const result = await delQueryServer(args, cachedDB);
-      result.status ? updateCache(result.cache) : '';
+    case checkIfRoleIsPrivileged(roles) &&
+      commands.delqueryserver.includes(action): {
+      const { Servers } = cachedDB;
+      const result = await delQueryServer(args, Servers);
+      result.status ? updateCache('Servers', result.cache) : '';
       message.channel.send(result.msg);
       break;
     }
@@ -48,12 +56,16 @@ bot.on('message', async message => {
       console.log(args[0]);
       break;
 
-    case commands.queryut99server: {
-      const result = await queryUT99Server(args[1], cachedDB);
+    case commands.queryut99server.includes(action): {
+      const { Servers } = cachedDB;
+      const result = await queryUT99Server(args[1], Servers);
       message.channel
         .send(result.status ? printServerStatus(result) : result.msg)
         .catch(console.error + ':query:');
       break;
+    }
+
+    case commands.addgametype.includes(action): {
     }
 
     default:
@@ -62,8 +74,9 @@ bot.on('message', async message => {
 });
 
 (async () => {
-  cachedDB = await API.getCopyOfDB();
+  cachedDB = await API.getCopyOfDB(`/`);
+  console.log(cachedDB);
   bot.login(process.env.DISCORD_BOT_TOKEN);
 })();
 
-const updateCache = newCache => (cachedDB = newCache);
+const updateCache = (toUpdate, newCache) => (cachedDB[toUpdate] = newCache);

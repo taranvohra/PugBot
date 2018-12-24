@@ -1,11 +1,12 @@
-export const prefix = '.';
+export const prefix = '~';
 
 export const commands = {
-  addqueryserver: 'addqueryserver',
-  delqueryserver: 'delqueryserver',
-  updatequeryserver: 'updatequeryserver',
-  queryut99server: 'q',
-  servers: 'servers',
+  addqueryserver: ['addqueryserver'],
+  delqueryserver: ['delqueryserver'],
+  updatequeryserver: ['updatequeryserver'],
+  queryut99server: ['q', 'query'],
+  servers: ['servers'],
+  addgametype: ['addgametype', 'agm'],
 };
 
 export const teams = {
