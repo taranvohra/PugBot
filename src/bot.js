@@ -107,8 +107,10 @@ bot.on('message', async message => {
         id: message.author.id,
         username: fixSpecialCharactersInName(message.author.username),
       };
-
       const result = joinGameType(args, user, Pugs, PugList);
+      result.forEach(({ pug, discriminator }) =>
+        pug ? updatePugList(discriminator, pug) : null
+      );
       message.channel
         .send(result.status ? printPugJoinStatus(result) : result.msg)
         .catch(console.error + ':join:');
@@ -121,7 +123,6 @@ bot.on('message', async message => {
         id: message.author.id,
         username: fixSpecialCharactersInName(message.author.username),
       };
-      const result
     }
 
     default:
@@ -135,3 +136,4 @@ bot.on('message', async message => {
 })();
 
 const updateCache = (toUpdate, newCache) => (cachedDB[toUpdate] = newCache);
+const updatePugList = (toUpdate, pug) => (PugList[toUpdate] = pug);

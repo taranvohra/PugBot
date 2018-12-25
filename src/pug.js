@@ -58,13 +58,14 @@ export const delGameType = async ([_, discriminator, ...args], Pugs) => {
 export const joinGameType = ([_, ...args], user, Pugs, PugList) => {
   try {
     const result = args.split(' ').map(g => {
-      const game = g.toLowerCase();
+      const game = g.toLowerCase(); // game is basically the discriminator
 
       if (!Pugs[game]) return { user, discriminator, joinStatus: -1 };
 
       const pugProps = Pugs[game];
       const pug = !PugList[game] ? new Pug(pugProps) : cloneDeep(PugList[game]);
       return {
+        pug,
         user,
         discriminator: pug.discriminator,
         noPlayers: pug.noPlayers,
@@ -73,6 +74,42 @@ export const joinGameType = ([_, ...args], user, Pugs, PugList) => {
       };
     });
     return { status: true, result };
+  } catch (error) {
+    console.log(error);
+    return { status: false, msg: 'Something went wrong' };
+  }
+};
+
+export const leaveGameType = ([action, ...args], user, Pugs, PugList) => {
+  try {
+    if (action === 'lva') {
+      const result = Object.values(PugList).map(p => {
+        const pug = cloneDeep(p);
+        const playerIndex = pug.findPlayer(user);
+        if (playerIndex > -1) {
+          pug.removePlayer(playerIndex);
+          return pug;
+        }
+        return null;
+      });
+      return { status: true, result };
+    } else {
+      const result = args.split(' ').map(p => {
+        const game = p.toLowerCase(); // game is basically the discriminator
+
+        if (!Pugs[game]) return null;
+        const pug = PugList[game] ? cloneDeep(PugList[game]) : null;
+        if (!pug) return null;
+
+        const playerIndex = pug.findPlayer(user);
+        if (playerIndex > -1) {
+          pug.removePlayer(playerIndex);
+          return pug;
+        }
+        return null;
+      });
+      return { status: true, result };
+    }
   } catch (error) {
     console.log(error);
     return { status: false, msg: 'Something went wrong' };
@@ -91,7 +128,7 @@ export class Pug {
     this.picking = false;
   }
 
-  pugFilled() {
+  fillPug() {
     this.picking = true;
   }
 
@@ -99,10 +136,18 @@ export class Pug {
     if (!this.picking) {
       if (this.list.findIndex(u => u.id === user.id) > -1) return 2;
       this.list.push(user);
-      this.list.length === this.noPlayers ? this.pugFilled() : null;
+      this.list.length === this.noPlayers ? this.fillPug() : null;
       return 1;
     }
     return 0;
+  }
+
+  removePlayer(index) {
+    this.list.splice(index, 1);
+  }
+
+  findPlayer(user) {
+    return this.list.findIndex(u => u.id === user.id);
   }
 
   destroy() {}
