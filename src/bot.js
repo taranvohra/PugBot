@@ -13,6 +13,7 @@ import {
   printServerStatus,
   printServerList,
   printPugJoinStatus,
+  printPugLeaveStatus,
   printPugStatuses,
 } from './formats';
 import { checkIfRoleIsPrivileged, fixSpecialCharactersInName } from './helpers';
@@ -116,12 +117,12 @@ bot.on('message', async message => {
         id: message.author.id,
         username: fixSpecialCharactersInName(message.author.username),
       };
-      const result = joinGameType(args, user, Pugs, PugList);
+      const { status, result, msg } = joinGameType(args, user, Pugs, PugList);
       result.forEach(({ pug, discriminator }) =>
         pug ? updatePugList(discriminator, pug) : null
       );
       message.channel
-        .send(result.status ? printPugJoinStatus(result) : result.msg)
+        .send(status ? printPugJoinStatus(result) : msg)
         .catch(console.error + ':join:');
       break;
     }
@@ -132,20 +133,22 @@ bot.on('message', async message => {
         id: message.author.id,
         username: fixSpecialCharactersInName(message.author.username),
       };
-      const result = leaveGameType(args, user, Pugs, PugList);
-      result.forEach(({ pug, discriminator }) =>
-        pug ? updatePugList(discriminator, pug) : null
-      );
+      const { status, result, msg } = leaveGameType(args, user, Pugs, PugList);
+      result.forEach(({ pug, discriminator }) => {
+        pug ? updatePugList(discriminator, pug) : null;
+      });
       message.channel
-        .send(result.status ? printPugLeaveStatus(result) : result.msg)
+        .send(status ? printPugLeaveStatus(result) : msg)
         .catch(console.error + ':leave:');
+      break;
     }
 
     case commands.listgametype.includes(action): {
-      const result = listAvailablePugs(args, PugList);
+      const { status, result, msg } = listAvailablePugs(args, PugList);
       message.channel
-        .send(result.status ? printPugStatuses(result) : result.msg)
+        .send(status ? printPugStatuses(result) : msg)
         .catch(console.error + ':list:');
+      break;
     }
     default:
       console.log('no match');

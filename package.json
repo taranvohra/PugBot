@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "author": "Taran Vohra",
   "scripts": {
-    "build": "babel src -d prod/",
+    "build": "babel src -s -d prod/",
     "start": "npm run build && node prod/bot.js"
   },
   "devDependencies": {

@@ -224,3 +224,4 @@ var queryUT99Server = exports.queryUT99Server = function () {
     return _ref7.apply(this, arguments);
   };
 }();
+//# sourceMappingURL=ut99query.js.map

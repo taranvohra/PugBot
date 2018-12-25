@@ -60,16 +60,16 @@ var addGameType = exports.addGameType = function () {
         gameName = _ref3[1],
         noPlayers = _ref3[2],
         noTeams = _ref3[3],
-        discriminator = _ref3[4];
+        uid = _ref3[4];
 
-    var pickingOrder, newGameType, result;
+    var discriminator, pickingOrder, newGameType, result;
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
             _context.prev = 0;
 
-            if (!(isNaN(noPlayers) || isNaN(noTeams) || !gameName || !discriminator)) {
+            if (!(isNaN(noPlayers) || isNaN(noTeams) || !gameName || !uid)) {
               _context.next = 3;
               break;
             }
@@ -77,24 +77,26 @@ var addGameType = exports.addGameType = function () {
             return _context.abrupt('return', { status: false, msg: 'Invalid command' });
 
           case 3:
+            discriminator = uid.toLowerCase();
+
             if (!Pugs[discriminator]) {
-              _context.next = 5;
+              _context.next = 6;
               break;
             }
 
             return _context.abrupt('return', { status: false, msg: 'Gametype already exists' });
 
-          case 5:
+          case 6:
             pickingOrder = (0, _helpers.getPickingOrder)(parseInt(noPlayers), parseInt(noTeams));
 
             if (pickingOrder) {
-              _context.next = 8;
+              _context.next = 9;
               break;
             }
 
             return _context.abrupt('return', { status: false, msg: 'Invalid No. of players/teams' });
 
-          case 8:
+          case 9:
             newGameType = {
               gameName: gameName,
               noPlayers: noPlayers,
@@ -102,26 +104,26 @@ var addGameType = exports.addGameType = function () {
               pickingOrder: pickingOrder,
               discriminator: discriminator
             };
-            _context.next = 11;
-            return _api2.default.pushToDB('/Pugs', discriminator.toLowerCase(), newGameType);
+            _context.next = 12;
+            return _api2.default.pushToDB('/Pugs', discriminator, newGameType);
 
-          case 11:
+          case 12:
             result = _context.sent;
             return _context.abrupt('return', (0, _extends3.default)({}, result, { msg: 'Gametype added' }));
 
-          case 15:
-            _context.prev = 15;
+          case 16:
+            _context.prev = 16;
             _context.t0 = _context['catch'](0);
 
             console.log(_context.t0);
             return _context.abrupt('return', { status: false, msg: 'Something went wrong' });
 
-          case 19:
+          case 20:
           case 'end':
             return _context.stop();
         }
       }
-    }, _callee, undefined, [[0, 15]]);
+    }, _callee, undefined, [[0, 16]]);
   }));
 
   return function addGameType(_x, _x2) {
@@ -184,20 +186,21 @@ var joinGameType = exports.joinGameType = function joinGameType(_ref7, user, Pug
       args = _ref8.slice(1);
 
   try {
-    var result = args.split(' ').map(function (g) {
+    var result = args.map(function (g) {
       var game = g.toLowerCase(); // game is basically the discriminator
 
-      if (!Pugs[game]) return { user: user, discriminator: discriminator, joinStatus: -1 };
+      if (!Pugs[game]) return { user: user, discriminator: game, joinStatus: -1 };
 
       var pugProps = Pugs[game];
       var pug = !PugList[game] ? new Pug(pugProps) : (0, _cloneDeep2.default)(PugList[game]);
+      var joinStatus = pug.addPlayer(user);
       return {
         pug: pug,
         user: user,
         discriminator: pug.discriminator,
         noPlayers: pug.noPlayers,
         activeCount: pug.list.length,
-        joinStatus: pug.addPlayer(user)
+        joinStatus: joinStatus
       };
     });
     return { status: true, result: result };
@@ -221,23 +224,23 @@ var leaveGameType = exports.leaveGameType = function leaveGameType(_ref9, user, 
           pug.removePlayer(playerIndex);
           return { pug: pug, user: user, discriminator: pug.discriminator };
         }
-        return null;
+        return {};
       });
       return { status: true, result: result };
     } else {
-      var _result = args.split(' ').map(function (g) {
+      var _result = args.map(function (g) {
         var game = g.toLowerCase(); // game is basically the discriminator
 
-        if (!Pugs[game]) return null;
+        if (!Pugs[game]) return {};
         var pug = PugList[game] ? (0, _cloneDeep2.default)(PugList[game]) : null;
-        if (!pug) return null;
+        if (!pug) return {};
 
         var playerIndex = pug.findPlayer(user);
         if (playerIndex > -1) {
           pug.removePlayer(playerIndex);
           return { pug: pug, user: user, discriminator: pug.discriminator };
         }
-        return null;
+        return {};
       });
       return { status: true, result: _result };
     }
@@ -247,11 +250,12 @@ var leaveGameType = exports.leaveGameType = function leaveGameType(_ref9, user, 
   }
 };
 
-// TODO: Use constants for commands for better DX
+// TODO: Use constants for commands for better DX and maybe separate them in methods
 var listAvailablePugs = exports.listAvailablePugs = function listAvailablePugs(_ref11, PugList) {
   var _ref12 = (0, _toArray3.default)(_ref11),
       action = _ref12[0],
-      args = _ref12.slice(1);
+      forGame = _ref12[1],
+      args = _ref12.slice(2);
 
   try {
     if (action === 'lsa') {
@@ -260,18 +264,41 @@ var listAvailablePugs = exports.listAvailablePugs = function listAvailablePugs(_
           discriminator: p.discriminator,
           noPlayers: p.noPlayers,
           list: [].concat((0, _toConsumableArray3.default)(p.list)),
-          picking: p.picking
+          picking: p.picking,
+          withList: true
         };
       });
       return { status: true, result: result };
-    } else if (action === 'list' || action === 'ls') {
-      var _result2 = args.split(' ').map(function (g) {
-        var game = g.toLowerCase(); // game is basically the discriminator
+    } else {
+      if (!forGame) {
+        var _result3 = (0, _values2.default)(PugList).map(function (p) {
+          return {
+            discriminator: p.discriminator,
+            noPlayers: p.noPlayers,
+            list: [].concat((0, _toConsumableArray3.default)(p.list)),
+            picking: p.picking,
+            withList: false
+          };
+        });
+        return { status: true, result: _result3 };
+      }
 
-        if (!PugList[game]) return null;
-      });
+      var game = forGame.toLowerCase(); // game is basically the discriminator
+      if (!PugList[game]) return null;
+      var pug = PugList[game];
+      var _result2 = [{
+        discriminator: pug.discriminator,
+        noPlayers: pug.noPlayers,
+        list: [].concat((0, _toConsumableArray3.default)(pug.list)),
+        picking: pug.picking,
+        withList: true
+      }];
+      return { status: true, result: _result2 };
     }
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    return { status: false, msg: 'Something went wrong' };
+  }
 };
 
 var Pug = exports.Pug = function () {
@@ -330,3 +357,4 @@ var Pug = exports.Pug = function () {
   }]);
   return Pug;
 }();
+//# sourceMappingURL=pug.js.map

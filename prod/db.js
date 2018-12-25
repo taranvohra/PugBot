@@ -25,3 +25,4 @@ var config = {
 };
 
 exports.default = _firebase2.default.initializeApp(config).database();
+//# sourceMappingURL=db.js.map

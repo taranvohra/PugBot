@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getTeamIndex = exports.getMinutesAndSeconds = exports.padNumberWithZero = exports.getPickingOrder = exports.getTeamScores = exports.getPlayerList = exports.checkIfRoleIsPrivileged = exports.createCacheFromSnapshot = exports.getUIDFromIndex = exports.getHostAndPortOfServerFromDB = exports.checkKeyExistenceFromIndex = exports.createObjectFromArray = exports.filterFalsyValues = exports.checkIfFinalPacket = undefined;
+exports.getTeamIndex = exports.getMinutesAndSeconds = exports.padNumberWithZero = exports.fixSpecialCharactersInName = exports.getPickingOrder = exports.getTeamScores = exports.getPlayerList = exports.checkIfRoleIsPrivileged = exports.createCacheFromSnapshot = exports.getUIDFromIndex = exports.getHostAndPortOfServerFromDB = exports.checkKeyExistenceFromIndex = exports.createObjectFromArray = exports.filterFalsyValues = exports.checkIfFinalPacket = undefined;
 
 var _values = require('babel-runtime/core-js/object/values');
 
@@ -156,7 +156,7 @@ var getPickingOrder = exports.getPickingOrder = function getPickingOrder(noPlaye
   return pickingOrder;
 };
 
-var fixSpecialCharactersInName = function fixSpecialCharactersInName(name) {
+var fixSpecialCharactersInName = exports.fixSpecialCharactersInName = function fixSpecialCharactersInName(name) {
   return name.replace(/(\*|`|:)/g, function (c) {
     return '\\' + c;
   });
@@ -180,3 +180,4 @@ var getTeamIndex = exports.getTeamIndex = function getTeamIndex(teamName) {
     return t === teamName;
   });
 };
+//# sourceMappingURL=helpers.js.map

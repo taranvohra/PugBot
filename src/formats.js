@@ -95,16 +95,16 @@ export const printPugJoinStatus = statuses => {
     (acc, { joinStatus, user, discriminator, activeCount, noPlayers }) => {
       switch (joinStatus) {
         case -1:
-          acc.nf += `No pug found: ${discriminator}\n`;
+          acc.nf += `No pug found: **${discriminator}**\n`;
           break;
         case 0:
-          acc.missed += `Sorry, ${discriminator.toUpperCase()} is already filled\n`;
+          acc.missed += `Sorry, **${discriminator.toUpperCase()}** is already filled\n`;
           break;
         case 1:
-          acc.joined += `:small_blue_diamond: **${discriminator.toUpperCase()} (${activeCount}/${noPlayers})** `;
+          acc.joined += `:small_blue_diamond: **${discriminator.toUpperCase()}** (${activeCount}/${noPlayers})`;
           break;
         case 2:
-          acc.aj += `You have already joined ${discriminator.toUpperCase()}`;
+          acc.aj += `You have already joined **${discriminator.toUpperCase()}**`;
           break;
         default:
           null;
@@ -114,7 +114,7 @@ export const printPugJoinStatus = statuses => {
     },
     { joined: ``, missed: ``, nf: ``, aj: ``, user: null }
   );
-  return `${joined.length > 0 ? `${user} joined ${joined}` : ``} ${
+  return `${joined.length > 0 ? `${user.username} joined ${joined}` : ``} ${
     missed.length > 0 ? `\n${missed}` : ``
   } ${aj.length > 0 ? `\n${aj}` : ``} ${nf.length > 0 ? `\n${nf}` : ``}`;
 };
@@ -128,7 +128,33 @@ export const printPugLeaveStatus = statuses => {
     },
     { user: null, msg: `` }
   );
-  return `${msg.length > 0 ? `${user} left ${msg}` : ``}`;
+  return `${
+    msg.length > 0
+      ? `${user.username} left ${msg}`
+      : `Cannot leave a pug you haven't joined :smart: `
+  }`;
 };
 
-export const printPugStatuses = statuses => {};
+export const printPugStatuses = statuses => {
+  return statuses.reduce(
+    (acc, { discriminator, noPlayers, list, picking, withList }) => {
+      if (withList) {
+        const base = `**${discriminator.toUpperCase()}** :fire: Players (${
+          picking ? noPlayers : list.length
+        }/${noPlayers}):`;
+        const players = list.reduce((acc, u) => {
+          acc += `*${u.username}* `;
+          return acc;
+        }, ``);
+        acc += `${base} ${players}\n`;
+        return acc;
+      } else {
+        acc += `:small_blue_diamond: **${discriminator.toUpperCase()} (${
+          picking ? noPlayers : list.length
+        }/${noPlayers}) `;
+        return acc;
+      }
+    },
+    ``
+  );
+};

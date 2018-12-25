@@ -28,3 +28,4 @@ var teams = exports.teams = {
 };
 
 var privilegedRoles = exports.privilegedRoles = ['Admins', 'Moderators'];
+//# sourceMappingURL=constants.js.map

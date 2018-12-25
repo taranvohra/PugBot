@@ -141,7 +141,7 @@ export const getPickingOrder = (noPlayers, noTeams) => {
   return pickingOrder;
 };
 
-const fixSpecialCharactersInName = name =>
+export const fixSpecialCharactersInName = name =>
   name.replace(/(\*|`|:)/g, c => '\\' + c);
 
 export const padNumberWithZero = number =>

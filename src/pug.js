@@ -3,13 +3,14 @@ import { getPickingOrder } from './helpers';
 import cloneDeep from 'lodash/cloneDeep';
 
 export const addGameType = async (
-  [_, gameName, noPlayers, noTeams, discriminator],
+  [_, gameName, noPlayers, noTeams, uid],
   Pugs
 ) => {
   try {
-    if (isNaN(noPlayers) || isNaN(noTeams) || !gameName || !discriminator)
+    if (isNaN(noPlayers) || isNaN(noTeams) || !gameName || !uid)
       return { status: false, msg: 'Invalid command' };
 
+    const discriminator = uid.toLowerCase();
     if (Pugs[discriminator])
       return { status: false, msg: 'Gametype already exists' };
 
@@ -29,11 +30,7 @@ export const addGameType = async (
       discriminator,
     };
 
-    const result = await API.pushToDB(
-      '/Pugs',
-      discriminator.toLowerCase(),
-      newGameType
-    );
+    const result = await API.pushToDB('/Pugs', discriminator, newGameType);
     return { ...result, msg: 'Gametype added' };
   } catch (error) {
     console.log(error);
@@ -60,17 +57,18 @@ export const joinGameType = ([_, ...args], user, Pugs, PugList) => {
     const result = args.map(g => {
       const game = g.toLowerCase(); // game is basically the discriminator
 
-      if (!Pugs[game]) return { user, discriminator, joinStatus: -1 };
+      if (!Pugs[game]) return { user, discriminator: game, joinStatus: -1 };
 
       const pugProps = Pugs[game];
       const pug = !PugList[game] ? new Pug(pugProps) : cloneDeep(PugList[game]);
+      const joinStatus = pug.addPlayer(user);
       return {
         pug,
         user,
         discriminator: pug.discriminator,
         noPlayers: pug.noPlayers,
         activeCount: pug.list.length,
-        joinStatus: pug.addPlayer(user),
+        joinStatus,
       };
     });
     return { status: true, result };
@@ -90,23 +88,23 @@ export const leaveGameType = ([action, ...args], user, Pugs, PugList) => {
           pug.removePlayer(playerIndex);
           return { pug, user, discriminator: pug.discriminator };
         }
-        return null;
+        return {};
       });
       return { status: true, result };
     } else {
       const result = args.map(g => {
         const game = g.toLowerCase(); // game is basically the discriminator
 
-        if (!Pugs[game]) return null;
+        if (!Pugs[game]) return {};
         const pug = PugList[game] ? cloneDeep(PugList[game]) : null;
-        if (!pug) return null;
+        if (!pug) return {};
 
         const playerIndex = pug.findPlayer(user);
         if (playerIndex > -1) {
           pug.removePlayer(playerIndex);
           return { pug, user, discriminator: pug.discriminator };
         }
-        return null;
+        return {};
       });
       return { status: true, result };
     }
@@ -125,6 +123,7 @@ export const listAvailablePugs = ([action, forGame, ...args], PugList) => {
         noPlayers: p.noPlayers,
         list: [...p.list],
         picking: p.picking,
+        withList: true,
       }));
       return { status: true, result };
     } else {
@@ -132,7 +131,9 @@ export const listAvailablePugs = ([action, forGame, ...args], PugList) => {
         const result = Object.values(PugList).map(p => ({
           discriminator: p.discriminator,
           noPlayers: p.noPlayers,
+          list: [...p.list],
           picking: p.picking,
+          withList: false,
         }));
         return { status: true, result };
       }
@@ -140,12 +141,15 @@ export const listAvailablePugs = ([action, forGame, ...args], PugList) => {
       const game = forGame.toLowerCase(); // game is basically the discriminator
       if (!PugList[game]) return null;
       const pug = PugList[game];
-      const result = {
-        discriminator: pug.discriminator,
-        noPlayers: pug.noPlayers,
-        list: [...pug.list],
-        picking: pug.picking,
-      };
+      const result = [
+        {
+          discriminator: pug.discriminator,
+          noPlayers: pug.noPlayers,
+          list: [...pug.list],
+          picking: pug.picking,
+          withList: true,
+        },
+      ];
       return { status: true, result };
     }
   } catch (error) {
