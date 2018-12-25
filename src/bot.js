@@ -2,7 +2,7 @@ import { Client } from 'discord.js';
 import dotenv from 'dotenv';
 import { prefix, commands } from './constants';
 import { addQueryServer, queryUT99Server, delQueryServer } from './ut99query';
-import { addGameType, delGameType, joinGameType } from './pug';
+import { addGameType, delGameType, joinGameType, leaveGameType } from './pug';
 import {
   printServerStatus,
   printServerList,
@@ -12,11 +12,13 @@ import { checkIfRoleIsPrivileged, fixSpecialCharactersInName } from './helpers';
 import { createSortedArrayFromObject } from './util';
 import API from './api';
 
+dotenv.config();
+
 /**
  * PugList is list of pugs active at any moment on the server
  * Pugs are the pug(s)/gametype(s) registered on the server with their props
  */
-dotenv.config();
+
 let cachedDB = {};
 let PugList = {};
 
@@ -123,6 +125,13 @@ bot.on('message', async message => {
         id: message.author.id,
         username: fixSpecialCharactersInName(message.author.username),
       };
+      const result = leaveGameType(args, user, Pugs, PugList);
+      result.forEach(({ pug, discriminator }) =>
+        pug ? updatePugList(discriminator, pug) : null
+      );
+      message.channel
+        .send(result.status ? printPugLeaveStatus(result) : result.msg)
+        .catch(console.error + ':leave:');
     }
 
     default:

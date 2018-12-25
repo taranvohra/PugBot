@@ -88,7 +88,7 @@ export const leaveGameType = ([action, ...args], user, Pugs, PugList) => {
         const playerIndex = pug.findPlayer(user);
         if (playerIndex > -1) {
           pug.removePlayer(playerIndex);
-          return pug;
+          return { pug, user, discriminator: pug.discriminator };
         }
         return null;
       });
@@ -104,7 +104,7 @@ export const leaveGameType = ([action, ...args], user, Pugs, PugList) => {
         const playerIndex = pug.findPlayer(user);
         if (playerIndex > -1) {
           pug.removePlayer(playerIndex);
-          return pug;
+          return { pug, user, discriminator: pug.discriminator };
         }
         return null;
       });

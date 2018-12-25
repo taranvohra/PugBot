@@ -114,7 +114,19 @@ export const printPugJoinStatus = statuses => {
     },
     { joined: ``, missed: ``, nf: ``, aj: ``, user: null }
   );
-  return `${user} joined ${joined} ${missed.length > 0 ? `\n${missed}` : ``} ${
-    aj.length > 0 ? `\n${aj}` : ``
-  } ${nf.length > 0 ? `\n${nf}` : ``}`;
+  return `${joined.length > 0 ? `${user} joined ${joined}` : ``} ${
+    missed.length > 0 ? `\n${missed}` : ``
+  } ${aj.length > 0 ? `\n${aj}` : ``} ${nf.length > 0 ? `\n${nf}` : ``}`;
+};
+
+export const printPugLeaveStatus = statuses => {
+  const { msg, user } = statuses.reduce(
+    (acc, { user, discriminator }) => {
+      acc.msg += discriminator ? `**${discriminator.toUpperCase()}** ` : ``;
+      acc.user = user;
+      return acc;
+    },
+    { user: null, msg: `` }
+  );
+  return `${msg.length > 0 ? `${user} left ${msg}` : ``}`;
 };
