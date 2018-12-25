@@ -2,11 +2,18 @@ import { Client } from 'discord.js';
 import dotenv from 'dotenv';
 import { prefix, commands } from './constants';
 import { addQueryServer, queryUT99Server, delQueryServer } from './ut99query';
-import { addGameType, delGameType, joinGameType, leaveGameType } from './pug';
+import {
+  addGameType,
+  delGameType,
+  joinGameType,
+  leaveGameType,
+  listAvailablePugs,
+} from './pug';
 import {
   printServerStatus,
   printServerList,
   printPugJoinStatus,
+  printPugStatuses,
 } from './formats';
 import { checkIfRoleIsPrivileged, fixSpecialCharactersInName } from './helpers';
 import { createSortedArrayFromObject } from './util';
@@ -134,6 +141,12 @@ bot.on('message', async message => {
         .catch(console.error + ':leave:');
     }
 
+    case commands.listgametype.includes(action): {
+      const result = listAvailablePugs(args, PugList);
+      message.channel
+        .send(result.status ? printPugStatuses(result) : result.msg)
+        .catch(console.error + ':list:');
+    }
     default:
       console.log('no match');
   }

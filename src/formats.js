@@ -130,3 +130,5 @@ export const printPugLeaveStatus = statuses => {
   );
   return `${msg.length > 0 ? `${user} left ${msg}` : ``}`;
 };
+
+export const printPugStatuses = statuses => {};

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.printServerList = exports.printServerStatus = undefined;
+exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printServerList = exports.printServerStatus = undefined;
 
 var _keys = require('babel-runtime/core-js/object/keys');
 
@@ -80,4 +80,55 @@ var printServerList = exports.printServerList = function printServerList(cachedD
   richEmbed.setDescription(desc);
   richEmbed.setFooter('To query, type .q ip');
   return richEmbed;
+};
+
+var printPugJoinStatus = exports.printPugJoinStatus = function printPugJoinStatus(statuses) {
+  var _statuses$reduce = statuses.reduce(function (acc, _ref2) {
+    var joinStatus = _ref2.joinStatus,
+        user = _ref2.user,
+        discriminator = _ref2.discriminator,
+        activeCount = _ref2.activeCount,
+        noPlayers = _ref2.noPlayers;
+
+    switch (joinStatus) {
+      case -1:
+        acc.nf += 'No pug found: ' + discriminator + '\n';
+        break;
+      case 0:
+        acc.missed += 'Sorry, ' + discriminator.toUpperCase() + ' is already filled\n';
+        break;
+      case 1:
+        acc.joined += ':small_blue_diamond: **' + discriminator.toUpperCase() + ' (' + activeCount + '/' + noPlayers + ')** ';
+        break;
+      case 2:
+        acc.aj += 'You have already joined ' + discriminator.toUpperCase();
+        break;
+      default:
+        null;
+    }
+    acc.user = user;
+    return acc;
+  }, { joined: '', missed: '', nf: '', aj: '', user: null }),
+      joined = _statuses$reduce.joined,
+      missed = _statuses$reduce.missed,
+      nf = _statuses$reduce.nf,
+      aj = _statuses$reduce.aj,
+      user = _statuses$reduce.user;
+
+  return (joined.length > 0 ? user + ' joined ' + joined : '') + ' ' + (missed.length > 0 ? '\n' + missed : '') + ' ' + (aj.length > 0 ? '\n' + aj : '') + ' ' + (nf.length > 0 ? '\n' + nf : '');
+};
+
+var printPugLeaveStatus = exports.printPugLeaveStatus = function printPugLeaveStatus(statuses) {
+  var _statuses$reduce2 = statuses.reduce(function (acc, _ref3) {
+    var user = _ref3.user,
+        discriminator = _ref3.discriminator;
+
+    acc.msg += discriminator ? '**' + discriminator.toUpperCase() + '** ' : '';
+    acc.user = user;
+    return acc;
+  }, { user: null, msg: '' }),
+      msg = _statuses$reduce2.msg,
+      user = _statuses$reduce2.user;
+
+  return '' + (msg.length > 0 ? user + ' left ' + msg : '');
 };

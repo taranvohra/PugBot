@@ -13,7 +13,9 @@ var commands = exports.commands = {
   servers: ['servers'],
   addgametype: ['addgametype', 'agm'],
   delgametype: ['delgametype', 'dgm'],
-  joingametype: ['join', 'j']
+  joingametype: ['j', 'join'],
+  leavegametype: ['lva', 'l', 'leave'],
+  listgametype: ['lsa', 'ls', 'list']
 };
 
 var teams = exports.teams = {

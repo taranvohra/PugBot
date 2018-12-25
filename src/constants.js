@@ -8,8 +8,9 @@ export const commands = {
   servers: ['servers'],
   addgametype: ['addgametype', 'agm'],
   delgametype: ['delgametype', 'dgm'],
-  joingametype: ['join', 'j'],
-  leavegametype: ['l', 'leave', 'lva'],
+  joingametype: ['j', 'join'],
+  leavegametype: ['lva', 'l', 'leave'],
+  listgametype: ['lsa', 'ls', 'list'],
 };
 
 export const teams = {

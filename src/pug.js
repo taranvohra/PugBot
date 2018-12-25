@@ -57,7 +57,7 @@ export const delGameType = async ([_, discriminator, ...args], Pugs) => {
 
 export const joinGameType = ([_, ...args], user, Pugs, PugList) => {
   try {
-    const result = args.split(' ').map(g => {
+    const result = args.map(g => {
       const game = g.toLowerCase(); // game is basically the discriminator
 
       if (!Pugs[game]) return { user, discriminator, joinStatus: -1 };
@@ -94,8 +94,8 @@ export const leaveGameType = ([action, ...args], user, Pugs, PugList) => {
       });
       return { status: true, result };
     } else {
-      const result = args.split(' ').map(p => {
-        const game = p.toLowerCase(); // game is basically the discriminator
+      const result = args.map(g => {
+        const game = g.toLowerCase(); // game is basically the discriminator
 
         if (!Pugs[game]) return null;
         const pug = PugList[game] ? cloneDeep(PugList[game]) : null;
@@ -116,6 +116,44 @@ export const leaveGameType = ([action, ...args], user, Pugs, PugList) => {
   }
 };
 
+// TODO: Use constants for commands for better DX and maybe separate them in methods
+export const listAvailablePugs = ([action, forGame, ...args], PugList) => {
+  try {
+    if (action === 'lsa') {
+      const result = Object.values(PugList).map(p => ({
+        discriminator: p.discriminator,
+        noPlayers: p.noPlayers,
+        list: [...p.list],
+        picking: p.picking,
+      }));
+      return { status: true, result };
+    } else {
+      if (!forGame) {
+        const result = Object.values(PugList).map(p => ({
+          discriminator: p.discriminator,
+          noPlayers: p.noPlayers,
+          picking: p.picking,
+        }));
+        return { status: true, result };
+      }
+
+      const game = forGame.toLowerCase(); // game is basically the discriminator
+      if (!PugList[game]) return null;
+      const pug = PugList[game];
+      const result = {
+        discriminator: pug.discriminator,
+        noPlayers: pug.noPlayers,
+        list: [...pug.list],
+        picking: pug.picking,
+      };
+      return { status: true, result };
+    }
+  } catch (error) {
+    console.log(error);
+    return { status: false, msg: 'Something went wrong' };
+  }
+};
+
 export class Pug {
   constructor({ discriminator, gameName, noPlayers, noTeams, pickingOrder }) {
     this.discriminator = discriminator;
@@ -123,9 +161,10 @@ export class Pug {
     this.noPlayers = noPlayers;
     this.noTeams = noTeams;
     this.pickingOrder = pickingOrder;
+    this.picking = false;
     this.list = [];
     this.captains = [];
-    this.picking = false;
+    this.team = {};
   }
 
   fillPug() {
@@ -135,7 +174,7 @@ export class Pug {
   addPlayer(user) {
     if (!this.picking) {
       if (this.list.findIndex(u => u.id === user.id) > -1) return 2;
-      this.list.push(user);
+      this.list.push({ team: null, ...user });
       this.list.length === this.noPlayers ? this.fillPug() : null;
       return 1;
     }

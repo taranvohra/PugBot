@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Pug = exports.joinGameType = exports.delGameType = exports.addGameType = undefined;
+exports.Pug = exports.listAvailablePugs = exports.leaveGameType = exports.joinGameType = exports.delGameType = exports.addGameType = undefined;
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
@@ -12,6 +12,14 @@ var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
+
+var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+
+var _values = require('babel-runtime/core-js/object/values');
+
+var _values2 = _interopRequireDefault(_values);
 
 var _toArray2 = require('babel-runtime/helpers/toArray');
 
@@ -95,7 +103,7 @@ var addGameType = exports.addGameType = function () {
               discriminator: discriminator
             };
             _context.next = 11;
-            return _api2.default.pushToDB('/Pugs', discriminator, newGameType);
+            return _api2.default.pushToDB('/Pugs', discriminator.toLowerCase(), newGameType);
 
           case 11:
             result = _context.sent;
@@ -170,36 +178,109 @@ var delGameType = exports.delGameType = function () {
   };
 }();
 
-var joinGameType = exports.joinGameType = function joinGameType(_ref7, Pugs, PugList) {
+var joinGameType = exports.joinGameType = function joinGameType(_ref7, user, Pugs, PugList) {
   var _ref8 = (0, _toArray3.default)(_ref7),
       _ = _ref8[0],
       args = _ref8.slice(1);
 
-  return args.split(' ').map(function (g) {
-    var game = g.toLowerCase();
+  try {
+    var result = args.split(' ').map(function (g) {
+      var game = g.toLowerCase(); // game is basically the discriminator
 
-    if (!Pugs[game]) return { status: false, msg: 'No such pug found for ' + g };
+      if (!Pugs[game]) return { user: user, discriminator: discriminator, joinStatus: -1 };
 
-    var pugProps = Pugs[game];
-    var pug = !PugList[game] ? new Pug(pugProps) : (0, _cloneDeep2.default)(PugList[game]);
+      var pugProps = Pugs[game];
+      var pug = !PugList[game] ? new Pug(pugProps) : (0, _cloneDeep2.default)(PugList[game]);
+      return {
+        pug: pug,
+        user: user,
+        discriminator: pug.discriminator,
+        noPlayers: pug.noPlayers,
+        activeCount: pug.list.length,
+        joinStatus: pug.addPlayer(user)
+      };
+    });
+    return { status: true, result: result };
+  } catch (error) {
+    console.log(error);
+    return { status: false, msg: 'Something went wrong' };
+  }
+};
 
-    return pug.list.length < pug.noPlayers ? {
-      status: true,
-      msg: '**' + 35344 + '** joined **' + pug.discriminator + '** (**' + pug.list.length + '/' + pug.noPlayers + ')**'
-    } : {
-      status: false,
-      msg: 'Sorry, **' + pug.discriminator + '** is already full'
-    };
-  });
+var leaveGameType = exports.leaveGameType = function leaveGameType(_ref9, user, Pugs, PugList) {
+  var _ref10 = (0, _toArray3.default)(_ref9),
+      action = _ref10[0],
+      args = _ref10.slice(1);
+
+  try {
+    if (action === 'lva') {
+      var result = (0, _values2.default)(PugList).map(function (p) {
+        var pug = (0, _cloneDeep2.default)(p);
+        var playerIndex = pug.findPlayer(user);
+        if (playerIndex > -1) {
+          pug.removePlayer(playerIndex);
+          return { pug: pug, user: user, discriminator: pug.discriminator };
+        }
+        return null;
+      });
+      return { status: true, result: result };
+    } else {
+      var _result = args.split(' ').map(function (g) {
+        var game = g.toLowerCase(); // game is basically the discriminator
+
+        if (!Pugs[game]) return null;
+        var pug = PugList[game] ? (0, _cloneDeep2.default)(PugList[game]) : null;
+        if (!pug) return null;
+
+        var playerIndex = pug.findPlayer(user);
+        if (playerIndex > -1) {
+          pug.removePlayer(playerIndex);
+          return { pug: pug, user: user, discriminator: pug.discriminator };
+        }
+        return null;
+      });
+      return { status: true, result: _result };
+    }
+  } catch (error) {
+    console.log(error);
+    return { status: false, msg: 'Something went wrong' };
+  }
+};
+
+// TODO: Use constants for commands for better DX
+var listAvailablePugs = exports.listAvailablePugs = function listAvailablePugs(_ref11, PugList) {
+  var _ref12 = (0, _toArray3.default)(_ref11),
+      action = _ref12[0],
+      args = _ref12.slice(1);
+
+  try {
+    if (action === 'lsa') {
+      var result = (0, _values2.default)(PugList).map(function (p) {
+        return {
+          discriminator: p.discriminator,
+          noPlayers: p.noPlayers,
+          list: [].concat((0, _toConsumableArray3.default)(p.list)),
+          picking: p.picking
+        };
+      });
+      return { status: true, result: result };
+    } else if (action === 'list' || action === 'ls') {
+      var _result2 = args.split(' ').map(function (g) {
+        var game = g.toLowerCase(); // game is basically the discriminator
+
+        if (!PugList[game]) return null;
+      });
+    }
+  } catch (error) {}
 };
 
 var Pug = exports.Pug = function () {
-  function Pug(_ref9) {
-    var discriminator = _ref9.discriminator,
-        gameName = _ref9.gameName,
-        noPlayers = _ref9.noPlayers,
-        noTeams = _ref9.noTeams,
-        pickingOrder = _ref9.pickingOrder;
+  function Pug(_ref13) {
+    var discriminator = _ref13.discriminator,
+        gameName = _ref13.gameName,
+        noPlayers = _ref13.noPlayers,
+        noTeams = _ref13.noTeams,
+        pickingOrder = _ref13.pickingOrder;
     (0, _classCallCheck3.default)(this, Pug);
 
     this.discriminator = discriminator;
@@ -207,18 +288,41 @@ var Pug = exports.Pug = function () {
     this.noPlayers = noPlayers;
     this.noTeams = noTeams;
     this.pickingOrder = pickingOrder;
+    this.picking = false;
     this.list = [];
     this.captains = [];
+    this.team = {};
   }
 
   (0, _createClass3.default)(Pug, [{
-    key: 'pugFilled',
-    value: function pugFilled() {}
+    key: 'fillPug',
+    value: function fillPug() {
+      this.picking = true;
+    }
   }, {
     key: 'addPlayer',
-    value: function addPlayer(discordId) {
-      this.list.push(discordId);
-      if (this.list.length === noPlayers) this.pugFilled();
+    value: function addPlayer(user) {
+      if (!this.picking) {
+        if (this.list.findIndex(function (u) {
+          return u.id === user.id;
+        }) > -1) return 2;
+        this.list.push((0, _extends3.default)({ team: null }, user));
+        this.list.length === this.noPlayers ? this.fillPug() : null;
+        return 1;
+      }
+      return 0;
+    }
+  }, {
+    key: 'removePlayer',
+    value: function removePlayer(index) {
+      this.list.splice(index, 1);
+    }
+  }, {
+    key: 'findPlayer',
+    value: function findPlayer(user) {
+      return this.list.findIndex(function (u) {
+        return u.id === user.id;
+      });
     }
   }, {
     key: 'destroy',
