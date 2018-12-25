@@ -2,14 +2,24 @@ import { Client } from 'discord.js';
 import dotenv from 'dotenv';
 import { prefix, commands } from './constants';
 import { addQueryServer, queryUT99Server, delQueryServer } from './ut99query';
-import { addGameType } from './pug';
-import { printServerStatus, printServerList } from './formats';
-import { checkIfRoleIsPrivileged } from './helpers';
+import { addGameType, delGameType, joinGameType } from './pug';
+import {
+  printServerStatus,
+  printServerList,
+  printPugJoinStatus,
+} from './formats';
+import { checkIfRoleIsPrivileged, fixSpecialCharactersInName } from './helpers';
 import { createSortedArrayFromObject } from './util';
 import API from './api';
 
+/**
+ * PugList is list of pugs active at any moment on the server
+ * Pugs are the pug(s)/gametype(s) registered on the server with their props
+ */
 dotenv.config();
 let cachedDB = {};
+let PugList = {};
+
 const disabledEvents = ['TYPING_START', 'CHANNEL_UPDATE', 'USER_UPDATE'];
 const bot = new Client({ disabledEvents });
 
@@ -80,6 +90,38 @@ bot.on('message', async message => {
       result.status ? updateCache('Pugs', result.cache) : '';
       message.channel.send(result.msg);
       break;
+    }
+
+    case commands.delgametype.includes(action): {
+      const { Pugs = {} } = cachedDB;
+
+      const result = await delGameType(args, Pugs);
+      result.status ? updateCache('Pugs', result.cache) : '';
+      message.channel.send(result.msg);
+      break;
+    }
+
+    case commands.joingametype.includes(action): {
+      const { Pugs = {} } = cachedDB;
+      const user = {
+        id: message.author.id,
+        username: fixSpecialCharactersInName(message.author.username),
+      };
+
+      const result = joinGameType(args, user, Pugs, PugList);
+      message.channel
+        .send(result.status ? printPugJoinStatus(result) : result.msg)
+        .catch(console.error + ':join:');
+      break;
+    }
+
+    case commands.leavegametype.includes(action): {
+      const { Pugs = {} } = cachedDB;
+      const user = {
+        id: message.author.id,
+        username: fixSpecialCharactersInName(message.author.username),
+      };
+      const result
     }
 
     default:

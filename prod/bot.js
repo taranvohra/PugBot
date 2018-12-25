@@ -32,8 +32,14 @@ var _api2 = _interopRequireDefault(_api);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * PugList is list of pugs active at any moment on the server
+ * Pugs are the pug(s)/gametype(s) registered on the server with their props
+ */
 _dotenv2.default.config();
 var cachedDB = {};
+var PugList = {};
+
 var disabledEvents = ['TYPING_START', 'CHANNEL_UPDATE', 'USER_UPDATE'];
 var bot = new _discord.Client({ disabledEvents: disabledEvents });
 
@@ -43,7 +49,7 @@ bot.on('ready', function () {
 
 bot.on('message', function () {
   var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(message) {
-    var args, action, roles, _cachedDB, _cachedDB$Servers, serversObj, Servers, _cachedDB2, _cachedDB2$Servers, _serversObj, _Servers, result, _cachedDB3, _cachedDB3$Servers, _serversObj2, _Servers2, _result, _cachedDB4, _cachedDB4$Servers, _serversObj3, _Servers3, _result2, _cachedDB5, _cachedDB5$Pugs, Pugs, _result3;
+    var args, action, roles, _cachedDB, _cachedDB$Servers, serversObj, Servers, _cachedDB2, _cachedDB2$Servers, _serversObj, _Servers, result, _cachedDB3, _cachedDB3$Servers, _serversObj2, _Servers2, _result, _cachedDB4, _cachedDB4$Servers, _serversObj3, _Servers3, _result2, _cachedDB5, _cachedDB5$Pugs, _Pugs, _result3, _cachedDB6, _cachedDB6$Pugs, _Pugs2, _result4, _result5;
 
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
@@ -65,79 +71,97 @@ bot.on('message', function () {
             return _context.abrupt('return');
 
           case 4:
+
+            console.log(message.author);
+
             args = message.content.substring(_constants.prefix.length).split(' ');
             action = args[0].toLowerCase();
             roles = message.member.roles;
             _context.t0 = true;
-            _context.next = _context.t0 === _constants.commands.servers.includes(action) ? 10 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.addqueryserver.includes(action)) ? 14 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.delqueryserver.includes(action)) ? 22 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.updatequeryserver) ? 30 : _context.t0 === _constants.commands.queryut99server.includes(action) ? 32 : _context.t0 === _constants.commands.addgametype.includes(action) ? 39 : 46;
+            _context.next = _context.t0 === _constants.commands.servers.includes(action) ? 11 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.addqueryserver.includes(action)) ? 15 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.delqueryserver.includes(action)) ? 23 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.updatequeryserver) ? 31 : _context.t0 === _constants.commands.queryut99server.includes(action) ? 33 : _context.t0 === _constants.commands.addgametype.includes(action) ? 40 : _context.t0 === _constants.commands.delgametype.includes(action) ? 47 : _context.t0 === _constants.commands.joingametype.includes(action) ? 54 : 55;
             break;
 
-          case 10:
+          case 11:
             _cachedDB = cachedDB, _cachedDB$Servers = _cachedDB.Servers, serversObj = _cachedDB$Servers === undefined ? {} : _cachedDB$Servers;
             Servers = (0, _util.createSortedArrayFromObject)(serversObj, 'timestamp');
 
 
             message.channel.send((0, _formats.printServerList)(Servers)).catch(console.error + ':list:');
-            return _context.abrupt('break', 47);
+            return _context.abrupt('break', 56);
 
-          case 14:
+          case 15:
             _cachedDB2 = cachedDB, _cachedDB2$Servers = _cachedDB2.Servers, _serversObj = _cachedDB2$Servers === undefined ? {} : _cachedDB2$Servers;
             _Servers = (0, _util.createSortedArrayFromObject)(_serversObj);
-            _context.next = 18;
+            _context.next = 19;
             return (0, _ut99query.addQueryServer)(args, _Servers);
 
-          case 18:
+          case 19:
             result = _context.sent;
 
             result.status ? updateCache('Servers', result.cache) : '';
             message.channel.send(result.msg);
-            return _context.abrupt('break', 47);
+            return _context.abrupt('break', 56);
 
-          case 22:
+          case 23:
             _cachedDB3 = cachedDB, _cachedDB3$Servers = _cachedDB3.Servers, _serversObj2 = _cachedDB3$Servers === undefined ? {} : _cachedDB3$Servers;
             _Servers2 = (0, _util.createSortedArrayFromObject)(_serversObj2);
-            _context.next = 26;
+            _context.next = 27;
             return (0, _ut99query.delQueryServer)(args, _Servers2);
 
-          case 26:
+          case 27:
             _result = _context.sent;
 
             _result.status ? updateCache('Servers', _result.cache) : '';
             message.channel.send(_result.msg);
-            return _context.abrupt('break', 47);
+            return _context.abrupt('break', 56);
 
-          case 30:
+          case 31:
             console.log(args[0]);
-            return _context.abrupt('break', 47);
+            return _context.abrupt('break', 56);
 
-          case 32:
+          case 33:
             _cachedDB4 = cachedDB, _cachedDB4$Servers = _cachedDB4.Servers, _serversObj3 = _cachedDB4$Servers === undefined ? {} : _cachedDB4$Servers;
             _Servers3 = (0, _util.createSortedArrayFromObject)(_serversObj3, 'timestamp');
-            _context.next = 36;
+            _context.next = 37;
             return (0, _ut99query.queryUT99Server)(args[1], _Servers3);
 
-          case 36:
+          case 37:
             _result2 = _context.sent;
 
             message.channel.send(_result2.status ? (0, _formats.printServerStatus)(_result2) : _result2.msg).catch(console.error + ':query:');
-            return _context.abrupt('break', 47);
+            return _context.abrupt('break', 56);
 
-          case 39:
-            _cachedDB5 = cachedDB, _cachedDB5$Pugs = _cachedDB5.Pugs, Pugs = _cachedDB5$Pugs === undefined ? {} : _cachedDB5$Pugs;
-            _context.next = 42;
-            return (0, _pug.addGameType)(args, Pugs);
+          case 40:
+            _cachedDB5 = cachedDB, _cachedDB5$Pugs = _cachedDB5.Pugs, _Pugs = _cachedDB5$Pugs === undefined ? {} : _cachedDB5$Pugs;
+            _context.next = 43;
+            return (0, _pug.addGameType)(args, _Pugs);
 
-          case 42:
+          case 43:
             _result3 = _context.sent;
 
             _result3.status ? updateCache('Pugs', _result3.cache) : '';
             message.channel.send(_result3.msg);
-            return _context.abrupt('break', 47);
-
-          case 46:
-            console.log('no match');
+            return _context.abrupt('break', 56);
 
           case 47:
+            _cachedDB6 = cachedDB, _cachedDB6$Pugs = _cachedDB6.Pugs, _Pugs2 = _cachedDB6$Pugs === undefined ? {} : _cachedDB6$Pugs;
+            _context.next = 50;
+            return (0, _pug.delGameType)(args, _Pugs2);
+
+          case 50:
+            _result4 = _context.sent;
+
+            _result4.status ? updateCache('Pugs', _result4.cache) : '';
+            message.channel.send(_result4.msg);
+            return _context.abrupt('break', 56);
+
+          case 54:
+            _result5 = joinGameType(args, Pugs, PugList);
+
+          case 55:
+            console.log('no match');
+
+          case 56:
           case 'end':
             return _context.stop();
         }

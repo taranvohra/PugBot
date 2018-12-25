@@ -7,6 +7,9 @@ export const commands = {
   queryut99server: ['q', 'query'],
   servers: ['servers'],
   addgametype: ['addgametype', 'agm'],
+  delgametype: ['delgametype', 'dgm'],
+  joingametype: ['join', 'j'],
+  leavegametype: ['l', 'leave', 'lva'],
 };
 
 export const teams = {

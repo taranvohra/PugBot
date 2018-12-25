@@ -142,10 +142,7 @@ var getTeamScores = exports.getTeamScores = function getTeamScores(info, maxTeam
  * @description Obtains the picking order for pug. Returns 0 if invalid props
  */
 var getPickingOrder = exports.getPickingOrder = function getPickingOrder(noPlayers, noTeams) {
-  console.log(noPlayers, noTeams);
-  console.log(noPlayers < noTeams || noPlayers % noTeams !== 0);
   if (noPlayers < noTeams || noPlayers % noTeams !== 0) return 0;
-  console.log('haaa');
   var pickingOrder = [];
   var idx = 0;
   var shouldSwitch = -1;

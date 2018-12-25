@@ -11,7 +11,9 @@ var commands = exports.commands = {
   updatequeryserver: ['updatequeryserver'],
   queryut99server: ['q', 'query'],
   servers: ['servers'],
-  addgametype: ['addgametype', 'agm']
+  addgametype: ['addgametype', 'agm'],
+  delgametype: ['delgametype', 'dgm'],
+  joingametype: ['join', 'j']
 };
 
 var teams = exports.teams = {

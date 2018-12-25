@@ -89,3 +89,32 @@ export const printServerList = cachedDB => {
   richEmbed.setFooter('To query, type .q ip');
   return richEmbed;
 };
+
+export const printPugJoinStatus = statuses => {
+  const { joined, missed, nf, aj, user } = statuses.reduce(
+    (acc, { joinStatus, user, discriminator, activeCount, noPlayers }) => {
+      switch (joinStatus) {
+        case -1:
+          acc.nf += `No pug found: ${discriminator}\n`;
+          break;
+        case 0:
+          acc.missed += `Sorry, ${discriminator.toUpperCase()} is already filled\n`;
+          break;
+        case 1:
+          acc.joined += `:small_blue_diamond: **${discriminator.toUpperCase()} (${activeCount}/${noPlayers})** `;
+          break;
+        case 2:
+          acc.aj += `You have already joined ${discriminator.toUpperCase()}`;
+          break;
+        default:
+          null;
+      }
+      acc.user = user;
+      return acc;
+    },
+    { joined: ``, missed: ``, nf: ``, aj: ``, user: null }
+  );
+  return `${user} joined ${joined} ${missed.length > 0 ? `\n${missed}` : ``} ${
+    aj.length > 0 ? `\n${aj}` : ``
+  } ${nf.length > 0 ? `\n${nf}` : ``}`;
+};
