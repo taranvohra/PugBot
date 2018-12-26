@@ -119,7 +119,7 @@ bot.on('message', async message => {
       };
       const { status, result, msg } = joinGameType(args, user, Pugs, PugList);
       result.forEach(({ pug, discriminator }) =>
-        pug ? updatePugList(discriminator, pug) : null
+        pug ? revisePugList(discriminator, pug, 'update') : null
       );
       message.channel
         .send(status ? printPugJoinStatus(result) : msg)
@@ -135,7 +135,13 @@ bot.on('message', async message => {
       };
       const { status, result, msg } = leaveGameType(args, user, Pugs, PugList);
       result.forEach(({ pug, discriminator }) => {
-        pug ? updatePugList(discriminator, pug) : null;
+        pug
+          ? revisePugList(
+              discriminator,
+              pug,
+              pug.list.length === 0 ? 'remove' : 'update'
+            )
+          : null;
       });
       message.channel
         .send(status ? printPugLeaveStatus(result) : msg)
@@ -161,4 +167,9 @@ bot.on('message', async message => {
 })();
 
 const updateCache = (toUpdate, newCache) => (cachedDB[toUpdate] = newCache);
-const updatePugList = (toUpdate, pug) => (PugList[toUpdate] = pug);
+
+const revisePugList = (discriminator, pug, action) => {
+  if (action === 'update') PugList[discriminator] = pug;
+  else if (action === 'remove' && PugList[discriminator])
+    delete PugList[discriminator];
+};

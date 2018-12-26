@@ -165,7 +165,7 @@ bot.on('message', function () {
             _result5.forEach(function (_ref2) {
               var pug = _ref2.pug,
                   discriminator = _ref2.discriminator;
-              return pug ? updatePugList(discriminator, pug) : null;
+              return pug ? revisePugList(discriminator, pug, 'update') : null;
             });
             message.channel.send(status ? (0, _formats.printPugJoinStatus)(_result5) : msg).catch(console.error + ':join:');
             return _context.abrupt('break', 69);
@@ -182,7 +182,7 @@ bot.on('message', function () {
               var pug = _ref3.pug,
                   discriminator = _ref3.discriminator;
 
-              pug ? updatePugList(discriminator, pug) : null;
+              pug ? revisePugList(discriminator, pug, pug.list.length === 0 ? 'remove' : 'update') : null;
             });
             message.channel.send(_status ? (0, _formats.printPugLeaveStatus)(_result6) : _msg).catch(console.error + ':leave:');
             return _context.abrupt('break', 69);
@@ -233,7 +233,8 @@ bot.on('message', function () {
 var updateCache = function updateCache(toUpdate, newCache) {
   return cachedDB[toUpdate] = newCache;
 };
-var updatePugList = function updatePugList(toUpdate, pug) {
-  return PugList[toUpdate] = pug;
+
+var revisePugList = function revisePugList(discriminator, pug, action) {
+  if (action === 'update') PugList[discriminator] = pug;else if (action === 'remove' && PugList[discriminator]) delete PugList[discriminator];
 };
 //# sourceMappingURL=bot.js.map

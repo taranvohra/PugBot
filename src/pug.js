@@ -54,6 +54,9 @@ export const delGameType = async ([_, discriminator, ...args], Pugs) => {
 
 export const joinGameType = ([_, ...args], user, Pugs, PugList) => {
   try {
+    if (args.length === 0)
+      return { status: false, result: [], msg: 'Invalid command' };
+
     const result = args.map(g => {
       const game = g.toLowerCase(); // game is basically the discriminator
 
@@ -92,6 +95,9 @@ export const leaveGameType = ([action, ...args], user, Pugs, PugList) => {
       });
       return { status: true, result };
     } else {
+      if (args.length === 0)
+        return { status: false, result: [], msg: 'Invalid command' };
+
       const result = args.map(g => {
         const game = g.toLowerCase(); // game is basically the discriminator
 

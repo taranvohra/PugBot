@@ -101,7 +101,7 @@ export const printPugJoinStatus = statuses => {
           acc.missed += `Sorry, **${discriminator.toUpperCase()}** is already filled\n`;
           break;
         case 1:
-          acc.joined += `:small_blue_diamond: **${discriminator.toUpperCase()}** (${activeCount}/${noPlayers})`;
+          acc.joined += `**${discriminator.toUpperCase()}** (${activeCount}/${noPlayers}) :small_blue_diamond: `;
           break;
         case 2:
           acc.aj += `You have already joined **${discriminator.toUpperCase()}**`;
@@ -114,9 +114,13 @@ export const printPugJoinStatus = statuses => {
     },
     { joined: ``, missed: ``, nf: ``, aj: ``, user: null }
   );
-  return `${joined.length > 0 ? `${user.username} joined ${joined}` : ``} ${
-    missed.length > 0 ? `\n${missed}` : ``
-  } ${aj.length > 0 ? `\n${aj}` : ``} ${nf.length > 0 ? `\n${nf}` : ``}`;
+  return `${
+    joined.length > 0
+      ? `${user.username} joined :small_blue_diamond: ${joined}`
+      : ``
+  } ${missed.length > 0 ? `\n${missed}` : ``} ${
+    aj.length > 0 ? `\n${aj}` : ``
+  } ${nf.length > 0 ? `\n${nf}` : ``}`;
 };
 
 export const printPugLeaveStatus = statuses => {
@@ -136,8 +140,8 @@ export const printPugLeaveStatus = statuses => {
 };
 
 export const printPugStatuses = statuses => {
-  return statuses.reduce(
-    (acc, { discriminator, noPlayers, list, picking, withList }) => {
+  const msg = statuses.reduce(
+    (acc, { discriminator, noPlayers, list, picking, withList }, i) => {
       if (withList) {
         const base = `**${discriminator.toUpperCase()}** :fire: Players (${
           picking ? noPlayers : list.length
@@ -149,12 +153,16 @@ export const printPugStatuses = statuses => {
         acc += `${base} ${players}\n`;
         return acc;
       } else {
-        acc += `:small_blue_diamond: **${discriminator.toUpperCase()} (${
+        acc += `${
+          i === 0 ? `:small_blue_diamond` : ``
+        } **${discriminator.toUpperCase()}** (${
           picking ? noPlayers : list.length
-        }/${noPlayers}) `;
+        }/${noPlayers}) :small_blue_diamond: `;
         return acc;
       }
     },
     ``
   );
+
+  return msg || `There are currently no pugs :FeelsBadMan:, try joining one`;
 };

@@ -98,7 +98,7 @@ var printPugJoinStatus = exports.printPugJoinStatus = function printPugJoinStatu
         acc.missed += 'Sorry, **' + discriminator.toUpperCase() + '** is already filled\n';
         break;
       case 1:
-        acc.joined += ':small_blue_diamond: **' + discriminator.toUpperCase() + '** (' + activeCount + '/' + noPlayers + ')';
+        acc.joined += '**' + discriminator.toUpperCase() + '** (' + activeCount + '/' + noPlayers + ') :small_blue_diamond: ';
         break;
       case 2:
         acc.aj += 'You have already joined **' + discriminator.toUpperCase() + '**';
@@ -115,7 +115,7 @@ var printPugJoinStatus = exports.printPugJoinStatus = function printPugJoinStatu
       aj = _statuses$reduce.aj,
       user = _statuses$reduce.user;
 
-  return (joined.length > 0 ? user.username + ' joined ' + joined : '') + ' ' + (missed.length > 0 ? '\n' + missed : '') + ' ' + (aj.length > 0 ? '\n' + aj : '') + ' ' + (nf.length > 0 ? '\n' + nf : '');
+  return (joined.length > 0 ? user.username + ' joined :small_blue_diamond: ' + joined : '') + ' ' + (missed.length > 0 ? '\n' + missed : '') + ' ' + (aj.length > 0 ? '\n' + aj : '') + ' ' + (nf.length > 0 ? '\n' + nf : '');
 };
 
 var printPugLeaveStatus = exports.printPugLeaveStatus = function printPugLeaveStatus(statuses) {
@@ -134,7 +134,7 @@ var printPugLeaveStatus = exports.printPugLeaveStatus = function printPugLeaveSt
 };
 
 var printPugStatuses = exports.printPugStatuses = function printPugStatuses(statuses) {
-  return statuses.reduce(function (acc, _ref4) {
+  var msg = statuses.reduce(function (acc, _ref4, i) {
     var discriminator = _ref4.discriminator,
         noPlayers = _ref4.noPlayers,
         list = _ref4.list,
@@ -150,9 +150,11 @@ var printPugStatuses = exports.printPugStatuses = function printPugStatuses(stat
       acc += base + ' ' + players + '\n';
       return acc;
     } else {
-      acc += ':small_blue_diamond: **' + discriminator.toUpperCase() + ' (' + (picking ? noPlayers : list.length) + '/' + noPlayers + ') ';
+      acc += (i === 0 ? ':small_blue_diamond' : '') + ' **' + discriminator.toUpperCase() + '** (' + (picking ? noPlayers : list.length) + '/' + noPlayers + ') :small_blue_diamond: ';
       return acc;
     }
   }, '');
+
+  return msg || 'There are currently no pugs :FeelsBadMan:, try joining one';
 };
 //# sourceMappingURL=formats.js.map

@@ -186,6 +186,8 @@ var joinGameType = exports.joinGameType = function joinGameType(_ref7, user, Pug
       args = _ref8.slice(1);
 
   try {
+    if (args.length === 0) return { status: false, result: [], msg: 'Invalid command' };
+
     var result = args.map(function (g) {
       var game = g.toLowerCase(); // game is basically the discriminator
 
@@ -228,6 +230,8 @@ var leaveGameType = exports.leaveGameType = function leaveGameType(_ref9, user, 
       });
       return { status: true, result: result };
     } else {
+      if (args.length === 0) return { status: false, result: [], msg: 'Invalid command' };
+
       var _result = args.map(function (g) {
         var game = g.toLowerCase(); // game is basically the discriminator
 
