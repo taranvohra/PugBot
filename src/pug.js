@@ -24,10 +24,10 @@ export const addGameType = async (
 
     const newGameType = {
       gameName,
-      noPlayers,
-      noTeams,
       pickingOrder,
       discriminator,
+      noPlayers: parseInt(noPlayers),
+      noTeams: parseInt(noTeams),
     };
 
     const result = await API.pushToDB('/Pugs', discriminator, newGameType);
@@ -174,11 +174,15 @@ export class Pug {
     this.picking = false;
     this.list = [];
     this.captains = [];
-    this.team = {};
+    this.teams = {};
   }
 
   fillPug() {
     this.picking = true;
+  }
+
+  stopPug() {
+    this.picking = false;
   }
 
   addPlayer(user) {
@@ -193,11 +197,12 @@ export class Pug {
 
   removePlayer(index) {
     this.list.splice(index, 1);
+    if (this.picking) this.stopPug();
   }
 
   findPlayer(user) {
     return this.list.findIndex(u => u.id === user.id);
   }
 
-  destroy() {}
+  cleanup() {}
 }

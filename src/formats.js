@@ -124,19 +124,21 @@ export const printPugJoinStatus = statuses => {
 };
 
 export const printPugLeaveStatus = statuses => {
-  const { msg, user } = statuses.reduce(
-    (acc, { user, discriminator }) => {
-      acc.msg += discriminator ? `**${discriminator.toUpperCase()}** ` : ``;
-      acc.user = user;
+  const { joined, nj, user } = statuses.reduce(
+    (acc, { pug, user, discriminator }) => {
+      if (pug) {
+        acc.joined += `**${discriminator.toUpperCase()}** `;
+        acc.user = user;
+      } else acc.nj = `Cannot leave pug(s) you haven't joined :smart:`;
       return acc;
     },
-    { user: null, msg: `` }
+    { user: null, joined: ``, nj: `` }
   );
-  return `${
-    msg.length > 0
-      ? `${user.username} left ${msg}`
-      : `Cannot leave a pug you haven't joined :smart: `
+  const msg = `${joined.length > 0 ? `${user.username} left ${joined}` : ``}${
+    nj.length > 0 ? `\n${nj}` : ``
   }`;
+
+  return msg || `There are no pugs to leave`;
 };
 
 export const printPugStatuses = statuses => {
@@ -154,7 +156,7 @@ export const printPugStatuses = statuses => {
         return acc;
       } else {
         acc += `${
-          i === 0 ? `:small_blue_diamond` : ``
+          i === 0 ? `:small_blue_diamond:` : ``
         } **${discriminator.toUpperCase()}** (${
           picking ? noPlayers : list.length
         }/${noPlayers}) :small_blue_diamond: `;
@@ -164,5 +166,29 @@ export const printPugStatuses = statuses => {
     ``
   );
 
-  return msg || `There are currently no pugs :FeelsBadMan:, try joining one`;
+  return msg || `There are currently no pugs :FeelsBadMan:, try joining one!`;
+};
+
+export const broadCastFilledPugs = filledPugs => {
+  return filledPugs.reduce((acc, curr) => {
+    const title = `**${curr.discriminator.toUpperCase()}** filled:`;
+    const body = curr.list.reduce((prev, player) => {
+      prev += `<@${player.id}> `;
+      return prev;
+    }, ``);
+    const footer = `Type \`.captain\` to become a captain. Random capts will be picked in 30 seconds`;
+    acc += `${title}\n${body}\n${footer}\n`;
+    return acc;
+  }, ``);
+};
+
+export const broadCastDeadPugs = deadPugs => {
+  return deadPugs.reduce((acc, curr, i) => {
+    acc += `${
+      i > 0 ? `\n` : ``
+    } :joy_cat: **${curr.discriminator.toUpperCase()}** was stopped because ${
+      curr.user.username
+    } left :joy_cat:`;
+    return acc;
+  }, ``);
 };

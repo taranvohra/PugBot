@@ -139,7 +139,7 @@ var getTeamScores = exports.getTeamScores = function getTeamScores(info, maxTeam
 /**
  * @param {Number} noOfPlayers
  * @param {Number} noOfTeams
- * @description Obtains the picking order for pug. Returns 0 if invalid props
+ * @description Obtains the picking order for pug. Returns 0 if invalid props. Returns [-1] for duels
  */
 var getPickingOrder = exports.getPickingOrder = function getPickingOrder(noPlayers, noTeams) {
   if (noPlayers < noTeams || noPlayers % noTeams !== 0) return 0;
@@ -153,7 +153,7 @@ var getPickingOrder = exports.getPickingOrder = function getPickingOrder(noPlaye
     idx = shouldSwitch === 0 ? (idx + 1) % noTeams : idx;
     remainingPlayers--;
   }
-  return pickingOrder;
+  return pickingOrder.length > 0 ? pickingOrder : [-1];
 };
 
 var fixSpecialCharactersInName = exports.fixSpecialCharactersInName = function fixSpecialCharactersInName(name) {

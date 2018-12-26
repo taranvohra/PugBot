@@ -15,6 +15,8 @@ import {
   printPugJoinStatus,
   printPugLeaveStatus,
   printPugStatuses,
+  broadCastFilledPugs,
+  broadCastDeadPugs,
 } from './formats';
 import { checkIfRoleIsPrivileged, fixSpecialCharactersInName } from './helpers';
 import { createSortedArrayFromObject } from './util';
@@ -118,12 +120,19 @@ bot.on('message', async message => {
         username: fixSpecialCharactersInName(message.author.username),
       };
       const { status, result, msg } = joinGameType(args, user, Pugs, PugList);
-      result.forEach(({ pug, discriminator }) =>
-        pug ? revisePugList(discriminator, pug, 'update') : null
-      );
+      const filledPugs = result.reduce((acc, { pug, discriminator }) => {
+        if (pug) {
+          revisePugList(discriminator, pug, 'update');
+          pug.list.length === parseInt(pug.noPlayers) ? acc.push(pug) : null;
+        }
+        return acc;
+      }, []);
       message.channel
         .send(status ? printPugJoinStatus(result) : msg)
         .catch(console.error + ':join:');
+      filledPugs.length > 0
+        ? message.channel.send(broadCastFilledPugs(filledPugs))
+        : null;
       break;
     }
 
@@ -134,18 +143,25 @@ bot.on('message', async message => {
         username: fixSpecialCharactersInName(message.author.username),
       };
       const { status, result, msg } = leaveGameType(args, user, Pugs, PugList);
-      result.forEach(({ pug, discriminator }) => {
-        pug
-          ? revisePugList(
-              discriminator,
-              pug,
-              pug.list.length === 0 ? 'remove' : 'update'
-            )
-          : null;
-      });
+      const deadPugs = result.reduce((acc, { pug, discriminator }) => {
+        if (pug) {
+          revisePugList(
+            discriminator,
+            pug,
+            pug.list.length === 0 ? 'remove' : 'update'
+          );
+          pug.list.length === parseInt(pug.noPlayers) - 1
+            ? acc.push({ ...pug, user })
+            : null;
+        }
+        return acc;
+      }, []);
       message.channel
         .send(status ? printPugLeaveStatus(result) : msg)
         .catch(console.error + ':leave:');
+      deadPugs.length > 0
+        ? message.channel.send(broadCastDeadPugs(deadPugs))
+        : null;
       break;
     }
 

@@ -99,10 +99,10 @@ var addGameType = exports.addGameType = function () {
           case 9:
             newGameType = {
               gameName: gameName,
-              noPlayers: noPlayers,
-              noTeams: noTeams,
               pickingOrder: pickingOrder,
-              discriminator: discriminator
+              discriminator: discriminator,
+              noPlayers: parseInt(noPlayers),
+              noTeams: parseInt(noTeams)
             };
             _context.next = 12;
             return _api2.default.pushToDB('/Pugs', discriminator, newGameType);
@@ -322,13 +322,18 @@ var Pug = exports.Pug = function () {
     this.picking = false;
     this.list = [];
     this.captains = [];
-    this.team = {};
+    this.teams = {};
   }
 
   (0, _createClass3.default)(Pug, [{
     key: 'fillPug',
     value: function fillPug() {
       this.picking = true;
+    }
+  }, {
+    key: 'stopPug',
+    value: function stopPug() {
+      this.picking = false;
     }
   }, {
     key: 'addPlayer',
@@ -347,6 +352,7 @@ var Pug = exports.Pug = function () {
     key: 'removePlayer',
     value: function removePlayer(index) {
       this.list.splice(index, 1);
+      if (this.picking) this.stopPug();
     }
   }, {
     key: 'findPlayer',
@@ -356,8 +362,8 @@ var Pug = exports.Pug = function () {
       });
     }
   }, {
-    key: 'destroy',
-    value: function destroy() {}
+    key: 'cleanup',
+    value: function cleanup() {}
   }]);
   return Pug;
 }();

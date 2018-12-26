@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.printPugStatuses = exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printServerList = exports.printServerStatus = undefined;
+exports.broadCastDeadPugs = exports.broadCastFilledPugs = exports.printPugStatuses = exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printServerList = exports.printServerStatus = undefined;
 
 var _keys = require('babel-runtime/core-js/object/keys');
 
@@ -120,17 +120,23 @@ var printPugJoinStatus = exports.printPugJoinStatus = function printPugJoinStatu
 
 var printPugLeaveStatus = exports.printPugLeaveStatus = function printPugLeaveStatus(statuses) {
   var _statuses$reduce2 = statuses.reduce(function (acc, _ref3) {
-    var user = _ref3.user,
+    var pug = _ref3.pug,
+        user = _ref3.user,
         discriminator = _ref3.discriminator;
 
-    acc.msg += discriminator ? '**' + discriminator.toUpperCase() + '** ' : '';
-    acc.user = user;
+    if (pug) {
+      acc.joined += '**' + discriminator.toUpperCase() + '** ';
+      acc.user = user;
+    } else acc.nj = 'Cannot leave pug(s) you haven\'t joined :smart:';
     return acc;
-  }, { user: null, msg: '' }),
-      msg = _statuses$reduce2.msg,
+  }, { user: null, joined: '', nj: '' }),
+      joined = _statuses$reduce2.joined,
+      nj = _statuses$reduce2.nj,
       user = _statuses$reduce2.user;
 
-  return '' + (msg.length > 0 ? user.username + ' left ' + msg : 'Cannot leave a pug you haven\'t joined :smart: ');
+  var msg = '' + (joined.length > 0 ? user.username + ' left ' + joined : '') + (nj.length > 0 ? '\n' + nj : '');
+
+  return msg || 'There are no pugs to leave';
 };
 
 var printPugStatuses = exports.printPugStatuses = function printPugStatuses(statuses) {
@@ -155,6 +161,26 @@ var printPugStatuses = exports.printPugStatuses = function printPugStatuses(stat
     }
   }, '');
 
-  return msg || 'There are currently no pugs :FeelsBadMan:, try joining one';
+  return msg || 'There are currently no pugs :FeelsBadMan:, try joining one!';
+};
+
+var broadCastFilledPugs = exports.broadCastFilledPugs = function broadCastFilledPugs(filledPugs) {
+  return filledPugs.reduce(function (acc, curr) {
+    var title = '**' + curr.discriminator.toUpperCase() + '** filled:';
+    var body = curr.list.reduce(function (prev, player) {
+      prev += '<@' + player.id + '> ';
+      return prev;
+    }, '');
+    var footer = 'Type `.captain` to become a captain. Random capts will be picked in 30 seconds';
+    acc += title + '\n' + body + '\n' + footer + '\n';
+    return acc;
+  }, '');
+};
+
+var broadCastDeadPugs = exports.broadCastDeadPugs = function broadCastDeadPugs(deadPugs) {
+  return deadPugs.reduce(function (acc, curr, i) {
+    acc += (i > 0 ? '\n' : '') + ' :joy_cat: **' + curr.discriminator.toUpperCase() + '** was stopped because ' + curr.user.username + ' left :joy_cat:';
+    return acc;
+  }, '');
 };
 //# sourceMappingURL=formats.js.map

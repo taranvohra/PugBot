@@ -124,7 +124,7 @@ export const getTeamScores = (info, maxTeams) => {
 /**
  * @param {Number} noOfPlayers
  * @param {Number} noOfTeams
- * @description Obtains the picking order for pug. Returns 0 if invalid props
+ * @description Obtains the picking order for pug. Returns 0 if invalid props. Returns [-1] for duels
  */
 export const getPickingOrder = (noPlayers, noTeams) => {
   if (noPlayers < noTeams || noPlayers % noTeams !== 0) return 0;
@@ -138,7 +138,7 @@ export const getPickingOrder = (noPlayers, noTeams) => {
     idx = shouldSwitch === 0 ? (idx + 1) % noTeams : idx;
     remainingPlayers--;
   }
-  return pickingOrder;
+  return pickingOrder.length > 0 ? pickingOrder : [-1];
 };
 
 export const fixSpecialCharactersInName = name =>
