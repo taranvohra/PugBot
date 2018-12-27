@@ -124,17 +124,19 @@ export const printPugJoinStatus = statuses => {
 };
 
 export const printPugLeaveStatus = statuses => {
-  const { joined, nj, user } = statuses.reduce(
+  const { left, nj, user } = statuses.reduce(
     (acc, { pug, user, discriminator }) => {
       if (pug) {
-        acc.joined += `**${discriminator.toUpperCase()}** `;
+        acc.left += `**${discriminator.toUpperCase()}** (${pug.list.length}/${
+          pug.noPlayers
+        })  `;
         acc.user = user;
       } else acc.nj = `Cannot leave pug(s) you haven't joined :smart:`;
       return acc;
     },
-    { user: null, joined: ``, nj: `` }
+    { user: null, left: ``, nj: `` }
   );
-  const msg = `${joined.length > 0 ? `${user.username} left ${joined}` : ``}${
+  const msg = `${left.length > 0 ? `${user.username} left  ${left}` : ``}${
     nj.length > 0 ? `\n${nj}` : ``
   }`;
 
@@ -171,7 +173,7 @@ export const printPugStatuses = statuses => {
 
 export const broadCastFilledPugs = filledPugs => {
   return filledPugs.reduce((acc, curr) => {
-    const title = `**${curr.discriminator.toUpperCase()}** filled:`;
+    const title = `**${curr.discriminator.toUpperCase()}** filled: `;
     const body = curr.list.reduce((prev, player) => {
       prev += `<@${player.id}> `;
       return prev;

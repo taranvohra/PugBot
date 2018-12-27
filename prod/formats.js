@@ -125,16 +125,16 @@ var printPugLeaveStatus = exports.printPugLeaveStatus = function printPugLeaveSt
         discriminator = _ref3.discriminator;
 
     if (pug) {
-      acc.joined += '**' + discriminator.toUpperCase() + '** ';
+      acc.left += '**' + discriminator.toUpperCase() + '** (' + pug.list.length + '/' + pug.noPlayers + ')  ';
       acc.user = user;
     } else acc.nj = 'Cannot leave pug(s) you haven\'t joined :smart:';
     return acc;
-  }, { user: null, joined: '', nj: '' }),
-      joined = _statuses$reduce2.joined,
+  }, { user: null, left: '', nj: '' }),
+      left = _statuses$reduce2.left,
       nj = _statuses$reduce2.nj,
       user = _statuses$reduce2.user;
 
-  var msg = '' + (joined.length > 0 ? user.username + ' left ' + joined : '') + (nj.length > 0 ? '\n' + nj : '');
+  var msg = '' + (left.length > 0 ? user.username + ' left  ' + left : '') + (nj.length > 0 ? '\n' + nj : '');
 
   return msg || 'There are no pugs to leave';
 };
@@ -156,7 +156,7 @@ var printPugStatuses = exports.printPugStatuses = function printPugStatuses(stat
       acc += base + ' ' + players + '\n';
       return acc;
     } else {
-      acc += (i === 0 ? ':small_blue_diamond' : '') + ' **' + discriminator.toUpperCase() + '** (' + (picking ? noPlayers : list.length) + '/' + noPlayers + ') :small_blue_diamond: ';
+      acc += (i === 0 ? ':small_blue_diamond:' : '') + ' **' + discriminator.toUpperCase() + '** (' + (picking ? noPlayers : list.length) + '/' + noPlayers + ') :small_blue_diamond: ';
       return acc;
     }
   }, '');
@@ -166,7 +166,7 @@ var printPugStatuses = exports.printPugStatuses = function printPugStatuses(stat
 
 var broadCastFilledPugs = exports.broadCastFilledPugs = function broadCastFilledPugs(filledPugs) {
   return filledPugs.reduce(function (acc, curr) {
-    var title = '**' + curr.discriminator.toUpperCase() + '** filled:';
+    var title = '**' + curr.discriminator.toUpperCase() + '** filled :100: ';
     var body = curr.list.reduce(function (prev, player) {
       prev += '<@' + player.id + '> ';
       return prev;

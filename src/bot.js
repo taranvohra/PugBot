@@ -43,15 +43,19 @@ bot.on('message', async message => {
   if (message.author.equals(bot.user)) return;
   if (!message.content.startsWith(prefix)) return;
 
+  const { Servers: serversObj = {}, Pugs = {} } = cachedDB;
+  const user = {
+    id: message.author.id,
+    username: fixSpecialCharactersInName(message.author.username),
+  };
+
   const args = message.content.substring(prefix.length).split(' ');
   const action = args[0].toLowerCase();
   const roles = message.member.roles;
 
   switch (true) {
     case commands.servers.includes(action): {
-      const { Servers: serversObj = {} } = cachedDB;
       const Servers = createSortedArrayFromObject(serversObj, 'timestamp');
-
       message.channel
         .send(printServerList(Servers))
         .catch(console.error + ':list:');
@@ -60,9 +64,7 @@ bot.on('message', async message => {
 
     case checkIfRoleIsPrivileged(roles) &&
       commands.addqueryserver.includes(action): {
-      const { Servers: serversObj = {} } = cachedDB;
       const Servers = createSortedArrayFromObject(serversObj);
-
       const result = await addQueryServer(args, Servers);
       result.status ? updateCache('Servers', result.cache) : '';
       message.channel.send(result.msg);
@@ -71,23 +73,15 @@ bot.on('message', async message => {
 
     case checkIfRoleIsPrivileged(roles) &&
       commands.delqueryserver.includes(action): {
-      const { Servers: serversObj = {} } = cachedDB;
       const Servers = createSortedArrayFromObject(serversObj);
-
       const result = await delQueryServer(args, Servers);
       result.status ? updateCache('Servers', result.cache) : '';
       message.channel.send(result.msg);
       break;
     }
 
-    case checkIfRoleIsPrivileged(roles) && commands.updatequeryserver:
-      console.log(args[0]);
-      break;
-
     case commands.queryut99server.includes(action): {
-      const { Servers: serversObj = {} } = cachedDB;
       const Servers = createSortedArrayFromObject(serversObj, 'timestamp');
-
       const result = await queryUT99Server(args[1], Servers);
       message.channel
         .send(result.status ? printServerStatus(result) : result.msg)
@@ -96,8 +90,6 @@ bot.on('message', async message => {
     }
 
     case commands.addgametype.includes(action): {
-      const { Pugs = {} } = cachedDB;
-
       const result = await addGameType(args, Pugs);
       result.status ? updateCache('Pugs', result.cache) : '';
       message.channel.send(result.msg);
@@ -105,8 +97,6 @@ bot.on('message', async message => {
     }
 
     case commands.delgametype.includes(action): {
-      const { Pugs = {} } = cachedDB;
-
       const result = await delGameType(args, Pugs);
       result.status ? updateCache('Pugs', result.cache) : '';
       message.channel.send(result.msg);
@@ -114,11 +104,6 @@ bot.on('message', async message => {
     }
 
     case commands.joingametype.includes(action): {
-      const { Pugs = {} } = cachedDB;
-      const user = {
-        id: message.author.id,
-        username: fixSpecialCharactersInName(message.author.username),
-      };
       const { status, result, msg } = joinGameType(args, user, Pugs, PugList);
       const filledPugs = result.reduce((acc, { pug, discriminator }) => {
         if (pug) {
@@ -137,11 +122,6 @@ bot.on('message', async message => {
     }
 
     case commands.leavegametype.includes(action): {
-      const { Pugs = {} } = cachedDB;
-      const user = {
-        id: message.author.id,
-        username: fixSpecialCharactersInName(message.author.username),
-      };
       const { status, result, msg } = leaveGameType(args, user, Pugs, PugList);
       const deadPugs = result.reduce((acc, { pug, discriminator }) => {
         if (pug) {
