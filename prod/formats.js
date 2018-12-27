@@ -166,7 +166,7 @@ var printPugStatuses = exports.printPugStatuses = function printPugStatuses(stat
 
 var broadCastFilledPugs = exports.broadCastFilledPugs = function broadCastFilledPugs(filledPugs) {
   return filledPugs.reduce(function (acc, curr) {
-    var title = '**' + curr.discriminator.toUpperCase() + '** filled :100: ';
+    var title = '**' + curr.discriminator.toUpperCase() + '** filled: ';
     var body = curr.list.reduce(function (prev, player) {
       prev += '<@' + player.id + '> ';
       return prev;
