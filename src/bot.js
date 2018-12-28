@@ -8,7 +8,6 @@ import {
   joinGameType,
   leaveGameType,
   listAvailablePugs,
-  removePeopleFromOtherPugs,
 } from './pug';
 import {
   printServerStatus,
@@ -121,7 +120,7 @@ bot.on('message', async message => {
         if (pug.list.length === pug.noPlayers) {
           Object.values(PugList).forEach(ap => {
             if (pug.discriminator !== ap.discriminator)
-              pug.list.forEach(async user => {
+              pug.list.forEach(user => {
                 const { result } = leaveGameType(
                   ['l', ap.discriminator],
                   user,
@@ -134,7 +133,7 @@ bot.on('message', async message => {
                     result[0].pug,
                     result[0].pug.list.length === 0 ? 'remove' : 'update'
                   );
-                  await message.channel.send(printPugLeaveStatus(result));
+                  message.channel.send(printPugLeaveStatus(result));
                 }
               });
           });

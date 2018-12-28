@@ -1,6 +1,7 @@
 import API from './api';
 import { getPickingOrder } from './helpers';
 import cloneDeep from 'lodash/cloneDeep';
+import { getRandomInt } from './util';
 
 export const addGameType = async (
   [_, gameName, noPlayers, noTeams, uid],
@@ -65,6 +66,8 @@ export const joinGameType = ([_, ...args], user, Pugs, PugList) => {
       const pugProps = Pugs[game];
       const pug = !PugList[game] ? new Pug(pugProps) : cloneDeep(PugList[game]);
       const joinStatus = pug.addPlayer(user);
+
+      PugList[game] && PugList[game].cleanup(); // because we have cloned p and will no longer be using it
       return {
         pug,
         user,
@@ -89,6 +92,8 @@ export const leaveGameType = ([action, ...args], user, Pugs, PugList) => {
         const playerIndex = pug.findPlayer(user);
         if (playerIndex > -1) {
           pug.removePlayer(playerIndex);
+
+          p.cleanup(); // because we have cloned p and will no longer be using it
           return { pug, user, discriminator: pug.discriminator };
         }
         return {};
@@ -108,6 +113,8 @@ export const leaveGameType = ([action, ...args], user, Pugs, PugList) => {
         const playerIndex = pug.findPlayer(user);
         if (playerIndex > -1) {
           pug.removePlayer(playerIndex);
+
+          PugList[game] && PugList[game].cleanup(); // because we have cloned p and will no longer be using it
           return { pug, user, discriminator: pug.discriminator };
         }
         return {};
@@ -173,22 +180,38 @@ export class Pug {
     this.pickingOrder = pickingOrder;
     this.picking = false;
     this.list = [];
-    this.captains = [];
     this.teams = {};
+    this.captainTimer = null;
   }
 
   fillPug() {
     this.picking = true;
+    this.captainTimer = setTimeout(() => {
+      const present = this.list.reduce(
+        (acc, { captain }) => (captain !== null ? ++acc : acc),
+        0
+      );
+      for (let i = 0; i < noTeams - present; i++) {
+        while (1) {
+          const pIndex = getRandomInt(0, noPlayers - 1);
+          if (this.list[pIndex]['captain'] !== null) {
+            this.list[pIndex]['captain'] = i;
+            break;
+          }
+        }
+      }
+    }, 30000);
   }
 
   stopPug() {
     this.picking = false;
+    this.list.forEach(user => (user.captain = null));
   }
 
   addPlayer(user) {
     if (!this.picking) {
       if (this.list.findIndex(u => u.id === user.id) > -1) return 2;
-      this.list.push({ team: null, ...user });
+      this.list.push({ team: null, captain: null, ...user });
       this.list.length === this.noPlayers ? this.fillPug() : null;
       return 1;
     }
@@ -204,5 +227,7 @@ export class Pug {
     return this.list.findIndex(u => u.id === user.id);
   }
 
-  cleanup() {}
+  cleanup() {
+    this.captainTimer ? clearInterval(this.captainTimer) : null;
+  }
 }
