@@ -89,3 +89,17 @@ export const queryUT99Server = async (args, cachedDB) => {
     return { status: false, msg: `Could not query` };
   }
 };
+
+export const setPreferredChannel = async channelId => {
+  try {
+    const result = await API.pushToDB(
+      '/Channel',
+      'preferredChannel',
+      channelId
+    );
+    return { ...result, msg: 'Channel preference set' };
+  } catch (error) {
+    console.log(error);
+    return { status: false, msg: 'Something went wrong' };
+  }
+};

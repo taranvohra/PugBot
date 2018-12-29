@@ -51,7 +51,17 @@ var _cloneDeep = require('lodash/cloneDeep');
 
 var _cloneDeep2 = _interopRequireDefault(_cloneDeep);
 
+var _util = require('./util');
+
+var _constants = require('./constants');
+
+var _events = require('events');
+
+var _events2 = _interopRequireDefault(_events);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var eventEmitter = new _events2.default.EventEmitter();
 
 var addGameType = exports.addGameType = function () {
   var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(_ref, Pugs) {
@@ -196,6 +206,8 @@ var joinGameType = exports.joinGameType = function joinGameType(_ref7, user, Pug
       var pugProps = Pugs[game];
       var pug = !PugList[game] ? new Pug(pugProps) : (0, _cloneDeep2.default)(PugList[game]);
       var joinStatus = pug.addPlayer(user);
+
+      PugList[game] && PugList[game].cleanup(); // because we have cloned p and will no longer be using it
       return {
         pug: pug,
         user: user,
@@ -224,6 +236,8 @@ var leaveGameType = exports.leaveGameType = function leaveGameType(_ref9, user, 
         var playerIndex = pug.findPlayer(user);
         if (playerIndex > -1) {
           pug.removePlayer(playerIndex);
+
+          p.cleanup(); // because we have cloned p and will no longer be using it
           return { pug: pug, user: user, discriminator: pug.discriminator };
         }
         return {};
@@ -242,6 +256,8 @@ var leaveGameType = exports.leaveGameType = function leaveGameType(_ref9, user, 
         var playerIndex = pug.findPlayer(user);
         if (playerIndex > -1) {
           pug.removePlayer(playerIndex);
+
+          PugList[game] && PugList[game].cleanup(); // because we have cloned p and will no longer be using it
           return { pug: pug, user: user, discriminator: pug.discriminator };
         }
         return {};
@@ -321,19 +337,41 @@ var Pug = exports.Pug = function () {
     this.pickingOrder = pickingOrder;
     this.picking = false;
     this.list = [];
-    this.captains = [];
     this.teams = {};
+    this.captainTimer = null;
   }
 
   (0, _createClass3.default)(Pug, [{
     key: 'fillPug',
     value: function fillPug() {
+      var _this = this;
+
       this.picking = true;
+      this.captainTimer = setTimeout(function () {
+        var present = _this.list.reduce(function (acc, _ref14) {
+          var captain = _ref14.captain;
+          return captain !== null ? ++acc : acc;
+        }, 0);
+        for (var i = 0; i < noTeams - present; i++) {
+          while (1) {
+            var pIndex = (0, _util.getRandomInt)(0, noPlayers - 1);
+            if (_this.list[pIndex]['captain'] !== null) {
+              _this.list[pIndex]['captain'] = i;
+              break;
+            }
+          }
+        }
+
+        eventEmitter.emit(_constants.pugEvents.captainsReady, _this.discriminator);
+      }, 30000);
     }
   }, {
     key: 'stopPug',
     value: function stopPug() {
       this.picking = false;
+      this.list.forEach(function (user) {
+        return user.captain = null;
+      });
     }
   }, {
     key: 'addPlayer',
@@ -342,7 +380,7 @@ var Pug = exports.Pug = function () {
         if (this.list.findIndex(function (u) {
           return u.id === user.id;
         }) > -1) return 2;
-        this.list.push((0, _extends3.default)({ team: null }, user));
+        this.list.push((0, _extends3.default)({ team: null, captain: null }, user));
         this.list.length === this.noPlayers ? this.fillPug() : null;
         return 1;
       }
@@ -363,7 +401,9 @@ var Pug = exports.Pug = function () {
     }
   }, {
     key: 'cleanup',
-    value: function cleanup() {}
+    value: function cleanup() {
+      this.captainTimer ? clearInterval(this.captainTimer) : null;
+    }
   }]);
   return Pug;
 }();

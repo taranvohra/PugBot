@@ -194,3 +194,18 @@ export const broadCastDeadPugs = deadPugs => {
     return acc;
   }, ``);
 };
+
+export const broadCastCaptainsReady = ({ list, captains }) => {
+  const pugCaptains = captains.reduce((acc, curr, index) => {
+    acc += `<@${curr.id}> is captain for **${teams[`team_${index}`]}**\n`;
+    return acc;
+  }, ``);
+  const { players } = list.reduce(
+    (acc, curr, index) => {
+      if (!curr.captain)
+        acc.players += `**${index + 1}**) *${curr.username}*  `;
+    },
+    { players: `Players: ` }
+  );
+  return `${pugCaptains}\n\n${players}`;
+};

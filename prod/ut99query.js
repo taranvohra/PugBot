@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.queryUT99Server = exports.updateQueryServer = exports.delQueryServer = exports.addQueryServer = undefined;
+exports.setPreferredChannel = exports.queryUT99Server = exports.updateQueryServer = exports.delQueryServer = exports.addQueryServer = undefined;
 
 var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
 
@@ -222,6 +222,41 @@ var queryUT99Server = exports.queryUT99Server = function () {
 
   return function queryUT99Server(_x5, _x6) {
     return _ref7.apply(this, arguments);
+  };
+}();
+
+var setPreferredChannel = exports.setPreferredChannel = function () {
+  var _ref10 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(channelId) {
+    var result;
+    return _regenerator2.default.wrap(function _callee4$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            _context4.prev = 0;
+            _context4.next = 3;
+            return _api2.default.pushToDB('/Channel', 'preferredChannel', channelId);
+
+          case 3:
+            result = _context4.sent;
+            return _context4.abrupt('return', (0, _extends3.default)({}, result, { msg: 'Channel preference set' }));
+
+          case 7:
+            _context4.prev = 7;
+            _context4.t0 = _context4['catch'](0);
+
+            console.log(_context4.t0);
+            return _context4.abrupt('return', { status: false, msg: 'Something went wrong' });
+
+          case 11:
+          case 'end':
+            return _context4.stop();
+        }
+      }
+    }, _callee4, undefined, [[0, 7]]);
+  }));
+
+  return function setPreferredChannel(_x7) {
+    return _ref10.apply(this, arguments);
   };
 }();
 //# sourceMappingURL=ut99query.js.map

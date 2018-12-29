@@ -1,6 +1,7 @@
 export const prefix = '~';
 
 export const commands = {
+  setchannel: ['setchannel'],
   addqueryserver: ['addqueryserver'],
   delqueryserver: ['delqueryserver'],
   updatequeryserver: ['updatequeryserver'],
@@ -23,3 +24,7 @@ export const teams = {
 };
 
 export const privilegedRoles = ['Admins', 'Moderators'];
+
+export const pugEvents = {
+  captainsReady: 'captainsReady',
+};

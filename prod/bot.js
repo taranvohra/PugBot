@@ -1,12 +1,12 @@
 'use strict';
 
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
 
 var _values = require('babel-runtime/core-js/object/values');
 
@@ -17,6 +17,10 @@ var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
 var _discord = require('discord.js');
+
+var _events = require('events');
+
+var _events2 = _interopRequireDefault(_events);
 
 var _dotenv = require('dotenv');
 
@@ -50,6 +54,7 @@ _dotenv2.default.config();
 var cachedDB = {};
 var PugList = {};
 
+var eventEmitter = new _events2.default.EventEmitter();
 var disabledEvents = ['TYPING_START', 'CHANNEL_UPDATE', 'USER_UPDATE'];
 var bot = new _discord.Client({ disabledEvents: disabledEvents });
 
@@ -58,30 +63,30 @@ bot.on('ready', function () {
 });
 
 bot.on('message', function () {
-  var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(message) {
-    var _cachedDB, _cachedDB$Servers, serversObj, _cachedDB$Pugs, Pugs, user, args, action, roles, Servers, _Servers, result, _Servers2, _result, _Servers3, _result2, _result3, _result4, _joinGameType, status, _result5, msg, filledPugs, forBroadcast, _leaveGameType2, _status, _result6, _msg, deadPugs, _listAvailablePugs, _status2, _result7, _msg2;
+  var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(message) {
+    var _cachedDB, _cachedDB$Servers, serversObj, _cachedDB$Pugs, Pugs, _cachedDB$Channel, Channel, user, args, action, roles, channelId, result, Servers, _Servers, _result, _Servers2, _result2, _Servers3, _result3, _result4, _result5, _joinGameType, status, _result6, msg, filledPugs, forBroadcast, _leaveGameType2, _status, _result7, _msg, deadPugs, _listAvailablePugs, _status2, _result8, _msg2;
 
-    return _regenerator2.default.wrap(function _callee2$(_context2) {
+    return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
-        switch (_context2.prev = _context2.next) {
+        switch (_context.prev = _context.next) {
           case 0:
             if (!message.author.equals(bot.user)) {
-              _context2.next = 2;
+              _context.next = 2;
               break;
             }
 
-            return _context2.abrupt('return');
+            return _context.abrupt('return');
 
           case 2:
             if (message.content.startsWith(_constants.prefix)) {
-              _context2.next = 4;
+              _context.next = 4;
               break;
             }
 
-            return _context2.abrupt('return');
+            return _context.abrupt('return');
 
           case 4:
-            _cachedDB = cachedDB, _cachedDB$Servers = _cachedDB.Servers, serversObj = _cachedDB$Servers === undefined ? {} : _cachedDB$Servers, _cachedDB$Pugs = _cachedDB.Pugs, Pugs = _cachedDB$Pugs === undefined ? {} : _cachedDB$Pugs;
+            _cachedDB = cachedDB, _cachedDB$Servers = _cachedDB.Servers, serversObj = _cachedDB$Servers === undefined ? {} : _cachedDB$Servers, _cachedDB$Pugs = _cachedDB.Pugs, Pugs = _cachedDB$Pugs === undefined ? {} : _cachedDB$Pugs, _cachedDB$Channel = _cachedDB.Channel, Channel = _cachedDB$Channel === undefined ? '' : _cachedDB$Channel;
             user = {
               id: message.author.id,
               username: (0, _helpers.fixSpecialCharactersInName)(message.author.username)
@@ -89,76 +94,88 @@ bot.on('message', function () {
             args = message.content.substring(_constants.prefix.length).split(' ');
             action = args[0].toLowerCase();
             roles = message.member.roles;
-            _context2.t0 = true;
-            _context2.next = _context2.t0 === _constants.commands.servers.includes(action) ? 12 : _context2.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.addqueryserver.includes(action)) ? 15 : _context2.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.delqueryserver.includes(action)) ? 22 : _context2.t0 === _constants.commands.queryut99server.includes(action) ? 29 : _context2.t0 === _constants.commands.addgametype.includes(action) ? 35 : _context2.t0 === _constants.commands.delgametype.includes(action) ? 41 : _context2.t0 === _constants.commands.joingametype.includes(action) ? 47 : _context2.t0 === _constants.commands.leavegametype.includes(action) ? 53 : _context2.t0 === _constants.commands.listgametype.includes(action) ? 58 : 61;
+            _context.t0 = true;
+            _context.next = _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.setchannel.includes(action)) ? 12 : _context.t0 === _constants.commands.servers.includes(action) ? 19 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.addqueryserver.includes(action)) ? 22 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.delqueryserver.includes(action)) ? 29 : _context.t0 === _constants.commands.queryut99server.includes(action) ? 36 : _context.t0 === _constants.commands.addgametype.includes(action) ? 42 : _context.t0 === _constants.commands.delgametype.includes(action) ? 48 : _context.t0 === _constants.commands.joingametype.includes(action) ? 54 : _context.t0 === _constants.commands.leavegametype.includes(action) ? 60 : _context.t0 === _constants.commands.listgametype.includes(action) ? 65 : 68;
             break;
 
           case 12:
-            Servers = (0, _util.createSortedArrayFromObject)(serversObj, 'timestamp');
-
-            message.channel.send((0, _formats.printServerList)(Servers)).catch(console.error + ':list:');
-            return _context2.abrupt('break', 62);
+            channelId = message.channel.id;
+            _context.next = 15;
+            return (0, _ut99query.setPreferredChannel)(channelId);
 
           case 15:
-            _Servers = (0, _util.createSortedArrayFromObject)(serversObj);
-            _context2.next = 18;
-            return (0, _ut99query.addQueryServer)(args, _Servers);
-
-          case 18:
-            result = _context2.sent;
+            result = _context.sent;
 
             result.status ? updateCache('Servers', result.cache) : '';
             message.channel.send(result.msg);
-            return _context2.abrupt('break', 62);
+            return _context.abrupt('break', 69);
+
+          case 19:
+            Servers = (0, _util.createSortedArrayFromObject)(serversObj, 'timestamp');
+
+            message.channel.send((0, _formats.printServerList)(Servers)).catch(console.error + ':list:');
+            return _context.abrupt('break', 69);
 
           case 22:
-            _Servers2 = (0, _util.createSortedArrayFromObject)(serversObj);
-            _context2.next = 25;
-            return (0, _ut99query.delQueryServer)(args, _Servers2);
+            _Servers = (0, _util.createSortedArrayFromObject)(serversObj);
+            _context.next = 25;
+            return (0, _ut99query.addQueryServer)(args, _Servers);
 
           case 25:
-            _result = _context2.sent;
+            _result = _context.sent;
 
             _result.status ? updateCache('Servers', _result.cache) : '';
             message.channel.send(_result.msg);
-            return _context2.abrupt('break', 62);
+            return _context.abrupt('break', 69);
 
           case 29:
-            _Servers3 = (0, _util.createSortedArrayFromObject)(serversObj, 'timestamp');
-            _context2.next = 32;
-            return (0, _ut99query.queryUT99Server)(args[1], _Servers3);
+            _Servers2 = (0, _util.createSortedArrayFromObject)(serversObj);
+            _context.next = 32;
+            return (0, _ut99query.delQueryServer)(args, _Servers2);
 
           case 32:
-            _result2 = _context2.sent;
+            _result2 = _context.sent;
 
-            message.channel.send(_result2.status ? (0, _formats.printServerStatus)(_result2) : _result2.msg).catch(console.error + ':query:');
-            return _context2.abrupt('break', 62);
+            _result2.status ? updateCache('Servers', _result2.cache) : '';
+            message.channel.send(_result2.msg);
+            return _context.abrupt('break', 69);
 
-          case 35:
-            _context2.next = 37;
+          case 36:
+            _Servers3 = (0, _util.createSortedArrayFromObject)(serversObj, 'timestamp');
+            _context.next = 39;
+            return (0, _ut99query.queryUT99Server)(args[1], _Servers3);
+
+          case 39:
+            _result3 = _context.sent;
+
+            message.channel.send(_result3.status ? (0, _formats.printServerStatus)(_result3) : _result3.msg).catch(console.error + ':query:');
+            return _context.abrupt('break', 69);
+
+          case 42:
+            _context.next = 44;
             return (0, _pug.addGameType)(args, Pugs);
 
-          case 37:
-            _result3 = _context2.sent;
-
-            _result3.status ? updateCache('Pugs', _result3.cache) : '';
-            message.channel.send(_result3.msg);
-            return _context2.abrupt('break', 62);
-
-          case 41:
-            _context2.next = 43;
-            return (0, _pug.delGameType)(args, Pugs);
-
-          case 43:
-            _result4 = _context2.sent;
+          case 44:
+            _result4 = _context.sent;
 
             _result4.status ? updateCache('Pugs', _result4.cache) : '';
             message.channel.send(_result4.msg);
-            return _context2.abrupt('break', 62);
+            return _context.abrupt('break', 69);
 
-          case 47:
-            _joinGameType = (0, _pug.joinGameType)(args, user, Pugs, PugList), status = _joinGameType.status, _result5 = _joinGameType.result, msg = _joinGameType.msg;
-            filledPugs = _result5.reduce(function (acc, _ref2) {
+          case 48:
+            _context.next = 50;
+            return (0, _pug.delGameType)(args, Pugs);
+
+          case 50:
+            _result5 = _context.sent;
+
+            _result5.status ? updateCache('Pugs', _result5.cache) : '';
+            message.channel.send(_result5.msg);
+            return _context.abrupt('break', 69);
+
+          case 54:
+            _joinGameType = (0, _pug.joinGameType)(args, user, Pugs, PugList), status = _joinGameType.status, _result6 = _joinGameType.result, msg = _joinGameType.msg;
+            filledPugs = _result6.reduce(function (acc, _ref2) {
               var pug = _ref2.pug,
                   discriminator = _ref2.discriminator;
 
@@ -169,55 +186,33 @@ bot.on('message', function () {
               return acc;
             }, []);
 
-            message.channel.send(status ? (0, _formats.printPugJoinStatus)(_result5) : msg).catch(console.error + ':join:');
+            message.channel.send(status ? (0, _formats.printPugJoinStatus)(_result6) : msg).catch(console.error + ':join:');
 
             forBroadcast = filledPugs.map(function (pug) {
               if (pug.list.length === pug.noPlayers) {
                 (0, _values2.default)(PugList).forEach(function (ap) {
-                  if (pug.discriminator !== ap.discriminator) pug.list.forEach(function () {
-                    var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(user) {
-                      var _leaveGameType, result;
+                  if (pug.discriminator !== ap.discriminator) pug.list.forEach(function (user) {
+                    var _leaveGameType = (0, _pug.leaveGameType)(['l', ap.discriminator], user, Pugs, PugList),
+                        result = _leaveGameType.result;
 
-                      return _regenerator2.default.wrap(function _callee$(_context) {
-                        while (1) {
-                          switch (_context.prev = _context.next) {
-                            case 0:
-                              _leaveGameType = (0, _pug.leaveGameType)(['l', ap.discriminator], user, Pugs, PugList), result = _leaveGameType.result;
-
-                              if (!result[0].pug) {
-                                _context.next = 5;
-                                break;
-                              }
-
-                              revisePugList(ap.discriminator, result[0].pug, result[0].pug.list.length === 0 ? 'remove' : 'update');
-                              _context.next = 5;
-                              return message.channel.send((0, _formats.printPugLeaveStatus)(result));
-
-                            case 5:
-                            case 'end':
-                              return _context.stop();
-                          }
-                        }
-                      }, _callee, undefined);
-                    }));
-
-                    return function (_x2) {
-                      return _ref3.apply(this, arguments);
-                    };
-                  }());
+                    if (result[0].pug) {
+                      revisePugList(ap.discriminator, result[0].pug, result[0].pug.list.length === 0 ? 'remove' : 'update');
+                      message.channel.send((0, _formats.printPugLeaveStatus)(result));
+                    }
+                  });
                 });
                 return pug;
               }
             });
 
             forBroadcast.length > 0 ? message.channel.send((0, _formats.broadCastFilledPugs)(forBroadcast)) : null;
-            return _context2.abrupt('break', 62);
+            return _context.abrupt('break', 69);
 
-          case 53:
-            _leaveGameType2 = (0, _pug.leaveGameType)(args, user, Pugs, PugList), _status = _leaveGameType2.status, _result6 = _leaveGameType2.result, _msg = _leaveGameType2.msg;
-            deadPugs = _result6.reduce(function (acc, _ref4) {
-              var pug = _ref4.pug,
-                  discriminator = _ref4.discriminator;
+          case 60:
+            _leaveGameType2 = (0, _pug.leaveGameType)(args, user, Pugs, PugList), _status = _leaveGameType2.status, _result7 = _leaveGameType2.result, _msg = _leaveGameType2.msg;
+            deadPugs = _result7.reduce(function (acc, _ref3) {
+              var pug = _ref3.pug,
+                  discriminator = _ref3.discriminator;
 
               if (pug) {
                 revisePugList(discriminator, pug, pug.list.length === 0 ? 'remove' : 'update');
@@ -226,25 +221,25 @@ bot.on('message', function () {
               return acc;
             }, []);
 
-            message.channel.send(_status ? (0, _formats.printPugLeaveStatus)(_result6) : _msg).catch(console.error + ':leave:');
+            message.channel.send(_status ? (0, _formats.printPugLeaveStatus)(_result7) : _msg).catch(console.error + ':leave:');
             deadPugs.length > 0 ? message.channel.send((0, _formats.broadCastDeadPugs)(deadPugs)) : null;
-            return _context2.abrupt('break', 62);
+            return _context.abrupt('break', 69);
 
-          case 58:
-            _listAvailablePugs = (0, _pug.listAvailablePugs)(args, PugList), _status2 = _listAvailablePugs.status, _result7 = _listAvailablePugs.result, _msg2 = _listAvailablePugs.msg;
+          case 65:
+            _listAvailablePugs = (0, _pug.listAvailablePugs)(args, PugList), _status2 = _listAvailablePugs.status, _result8 = _listAvailablePugs.result, _msg2 = _listAvailablePugs.msg;
 
-            message.channel.send(_status2 ? (0, _formats.printPugStatuses)(_result7) : _msg2).catch(console.error + ':list:');
-            return _context2.abrupt('break', 62);
+            message.channel.send(_status2 ? (0, _formats.printPugStatuses)(_result8) : _msg2).catch(console.error + ':list:');
+            return _context.abrupt('break', 69);
 
-          case 61:
+          case 68:
             console.log('no match');
 
-          case 62:
+          case 69:
           case 'end':
-            return _context2.stop();
+            return _context.stop();
         }
       }
-    }, _callee2, undefined);
+    }, _callee, undefined);
   }));
 
   return function (_x) {
@@ -252,25 +247,25 @@ bot.on('message', function () {
   };
 }());
 
-(0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
-  return _regenerator2.default.wrap(function _callee3$(_context3) {
+(0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
+  return _regenerator2.default.wrap(function _callee2$(_context2) {
     while (1) {
-      switch (_context3.prev = _context3.next) {
+      switch (_context2.prev = _context2.next) {
         case 0:
-          _context3.next = 2;
+          _context2.next = 2;
           return _api2.default.getCopyOfDB('/');
 
         case 2:
-          cachedDB = _context3.sent;
+          cachedDB = _context2.sent;
 
           bot.login(process.env.DISCORD_BOT_TOKEN);
 
         case 4:
         case 'end':
-          return _context3.stop();
+          return _context2.stop();
       }
     }
-  }, _callee3, undefined);
+  }, _callee2, undefined);
 }))();
 
 var updateCache = function updateCache(toUpdate, newCache) {
@@ -280,4 +275,10 @@ var updateCache = function updateCache(toUpdate, newCache) {
 var revisePugList = function revisePugList(discriminator, pug, action) {
   if (action === 'update') PugList[discriminator] = pug;else if (action === 'remove' && PugList[discriminator]) delete PugList[discriminator];
 };
+
+/*
+  Events emitted for pugs
+*/
+
+eventEmitter.on(_constants.pugEvents.captainsReady, function (discriminator) {});
 //# sourceMappingURL=bot.js.map

@@ -13,6 +13,8 @@ var _keys = require("babel-runtime/core-js/object/keys");
 
 var _keys2 = _interopRequireDefault(_keys);
 
+exports.getRandomInt = getRandomInt;
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var createSortedArrayFromObject = exports.createSortedArrayFromObject = function createSortedArrayFromObject(obj, sortBy) {
@@ -23,4 +25,10 @@ var createSortedArrayFromObject = exports.createSortedArrayFromObject = function
     return a[sortBy] - b[sortBy];
   });
 };
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 //# sourceMappingURL=util.js.map

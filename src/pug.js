@@ -2,6 +2,10 @@ import API from './api';
 import { getPickingOrder } from './helpers';
 import cloneDeep from 'lodash/cloneDeep';
 import { getRandomInt } from './util';
+import { pugEvents } from './constants';
+import events from 'events';
+
+const eventEmitter = new events.EventEmitter();
 
 export const addGameType = async (
   [_, gameName, noPlayers, noTeams, uid],
@@ -180,6 +184,7 @@ export class Pug {
     this.pickingOrder = pickingOrder;
     this.picking = false;
     this.list = [];
+    this.captains = [];
     this.teams = {};
     this.captainTimer = null;
   }
@@ -196,16 +201,19 @@ export class Pug {
           const pIndex = getRandomInt(0, noPlayers - 1);
           if (this.list[pIndex]['captain'] !== null) {
             this.list[pIndex]['captain'] = i;
+            this.captains.push(this.list[pIndex]);
             break;
           }
         }
       }
+      eventEmitter.emit(pugEvents.captainsReady, this.discriminator);
     }, 30000);
   }
 
   stopPug() {
     this.picking = false;
     this.list.forEach(user => (user.captain = null));
+    this.cleanup();
   }
 
   addPlayer(user) {
@@ -228,6 +236,6 @@ export class Pug {
   }
 
   cleanup() {
-    this.captainTimer ? clearInterval(this.captainTimer) : null;
+    clearInterval(this.captainTimer);
   }
 }

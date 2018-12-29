@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 var prefix = exports.prefix = '~';
 
 var commands = exports.commands = {
+  setchannel: ['setchannel'],
   addqueryserver: ['addqueryserver'],
   delqueryserver: ['delqueryserver'],
   updatequeryserver: ['updatequeryserver'],
@@ -28,4 +29,8 @@ var teams = exports.teams = {
 };
 
 var privilegedRoles = exports.privilegedRoles = ['Admins', 'Moderators'];
+
+var pugEvents = exports.pugEvents = {
+  captainsReady: 'captainsReady'
+};
 //# sourceMappingURL=constants.js.map

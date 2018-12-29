@@ -1,7 +1,13 @@
 import { Client } from 'discord.js';
+import events from 'events';
 import dotenv from 'dotenv';
-import { prefix, commands } from './constants';
-import { addQueryServer, queryUT99Server, delQueryServer } from './ut99query';
+import { prefix, commands, pugEvents } from './constants';
+import {
+  addQueryServer,
+  queryUT99Server,
+  delQueryServer,
+  setPreferredChannel,
+} from './ut99query';
 import {
   addGameType,
   delGameType,
@@ -32,6 +38,7 @@ dotenv.config();
 let cachedDB = {};
 let PugList = {};
 
+const eventEmitter = new events.EventEmitter();
 const disabledEvents = ['TYPING_START', 'CHANNEL_UPDATE', 'USER_UPDATE'];
 const bot = new Client({ disabledEvents });
 
@@ -43,7 +50,7 @@ bot.on('message', async message => {
   if (message.author.equals(bot.user)) return;
   if (!message.content.startsWith(prefix)) return;
 
-  const { Servers: serversObj = {}, Pugs = {} } = cachedDB;
+  const { Servers: serversObj = {}, Pugs = {}, Channel = {} } = cachedDB;
   const user = {
     id: message.author.id,
     username: fixSpecialCharactersInName(message.author.username),
@@ -54,6 +61,15 @@ bot.on('message', async message => {
   const roles = message.member.roles;
 
   switch (true) {
+    case checkIfRoleIsPrivileged(roles) &&
+      commands.setchannel.includes(action): {
+      const channelId = message.channel.id;
+      const result = await setPreferredChannel(channelId);
+      result.status ? updateCache('Servers', result.cache) : '';
+      message.channel.send(result.msg);
+      break;
+    }
+
     case commands.servers.includes(action): {
       const Servers = createSortedArrayFromObject(serversObj, 'timestamp');
       message.channel
@@ -194,3 +210,11 @@ const revisePugList = (discriminator, pug, action) => {
   else if (action === 'remove' && PugList[discriminator])
     delete PugList[discriminator];
 };
+
+/*
+  Events emitted for pugs
+*/
+
+eventEmitter.on(pugEvents.captainsReady, discriminator => {
+  const pug = PugList[discriminator];
+});
