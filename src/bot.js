@@ -211,6 +211,9 @@ bot.on('message', async message => {
             : msg || `**${result.pickedPlayers.username}** is already picked`
         )
         .catch(console.error + ':pick:');
+      !result.picking
+        ? revisePugList(result.pug.discriminator, result.pug, 'remove')
+        : ``;
     }
     default:
       console.log('no match');

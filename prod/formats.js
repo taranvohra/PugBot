@@ -237,6 +237,6 @@ var printPickStatus = exports.printPickStatus = function printPickStatus(_ref6) 
     return acc;
   }, '');
 
-  return picked + '\n' + turn + '\n' + (picking ? players : '') + '\n' + activeTeams;
+  return picked + '\n' + turn + '\n' + (picking ? players + '\n' : '') + '\n' + activeTeams;
 };
 //# sourceMappingURL=formats.js.map
