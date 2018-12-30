@@ -1,6 +1,6 @@
 import { Client } from 'discord.js';
-import events from 'events';
 import dotenv from 'dotenv';
+import pugEventEmitter from './pugEvent';
 import { prefix, commands, pugEvents } from './constants';
 import {
   addQueryServer,
@@ -23,6 +23,7 @@ import {
   printPugStatuses,
   broadCastFilledPugs,
   broadCastDeadPugs,
+  broadCastCaptainsReady,
 } from './formats';
 import { checkIfRoleIsPrivileged, fixSpecialCharactersInName } from './helpers';
 import { createSortedArrayFromObject } from './util';
@@ -38,7 +39,6 @@ dotenv.config();
 let cachedDB = {};
 let PugList = {};
 
-const eventEmitter = new events.EventEmitter();
 const disabledEvents = ['TYPING_START', 'CHANNEL_UPDATE', 'USER_UPDATE'];
 const bot = new Client({ disabledEvents });
 
@@ -50,7 +50,7 @@ bot.on('message', async message => {
   if (message.author.equals(bot.user)) return;
   if (!message.content.startsWith(prefix)) return;
 
-  const { Servers: serversObj = {}, Pugs = {}, Channel = {} } = cachedDB;
+  const { Servers: serversObj = {}, Pugs = {} } = cachedDB;
   const user = {
     id: message.author.id,
     username: fixSpecialCharactersInName(message.author.username),
@@ -215,6 +215,11 @@ const revisePugList = (discriminator, pug, action) => {
   Events emitted for pugs
 */
 
-eventEmitter.on(pugEvents.captainsReady, discriminator => {
+pugEventEmitter.on(pugEvents.captainsReady, discriminator => {
+  const { Channel = {} } = cachedDB;
   const pug = PugList[discriminator];
+  bot.channels
+    .get(Channel.preferredChannel)
+    .send(broadCastCaptainsReady(pug))
+    .catch(console.error + ':broadCastCaptains:');
 });

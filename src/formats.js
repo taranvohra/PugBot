@@ -188,22 +188,23 @@ export const broadCastDeadPugs = deadPugs => {
   return deadPugs.reduce((acc, curr, i) => {
     acc += `${
       i > 0 ? `\n` : ``
-    } :joy_cat: **${curr.discriminator.toUpperCase()}** was stopped because ${
+    } :joy_cat: **${curr.discriminator.toUpperCase()}** was stopped because **${
       curr.user.username
-    } left :joy_cat:`;
+    }** left :joy_cat:`;
     return acc;
   }, ``);
 };
 
 export const broadCastCaptainsReady = ({ list, captains }) => {
   const pugCaptains = captains.reduce((acc, curr, index) => {
-    acc += `<@${curr.id}> is captain for **${teams[`team_${index}`]}**\n`;
+    acc += `<@${curr.id}> is the captain for **${teams[`team_${index}`]}**\n`;
     return acc;
   }, ``);
   const { players } = list.reduce(
     (acc, curr, index) => {
-      if (!curr.captain)
+      if (curr.captain === null)
         acc.players += `**${index + 1}**) *${curr.username}*  `;
+      return acc;
     },
     { players: `Players: ` }
   );

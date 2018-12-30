@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/pugEvent.js"],"names":["pugEventEmitter","events","EventEmitter"],"mappings":";;;;;;AAAA;;;;;;AACA,IAAMA,kBAAkB,IAAIC,iBAAOC,YAAX,EAAxB;kBACeF,e","file":"pugEvent.js","sourcesContent":["import events from 'events';\nconst pugEventEmitter = new events.EventEmitter();\nexport default pugEventEmitter;\n"]}

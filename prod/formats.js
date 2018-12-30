@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.broadCastDeadPugs = exports.broadCastFilledPugs = exports.printPugStatuses = exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printServerList = exports.printServerStatus = undefined;
+exports.broadCastCaptainsReady = exports.broadCastDeadPugs = exports.broadCastFilledPugs = exports.printPugStatuses = exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printServerList = exports.printServerStatus = undefined;
 
 var _keys = require('babel-runtime/core-js/object/keys');
 
@@ -182,5 +182,23 @@ var broadCastDeadPugs = exports.broadCastDeadPugs = function broadCastDeadPugs(d
     acc += (i > 0 ? '\n' : '') + ' :joy_cat: **' + curr.discriminator.toUpperCase() + '** was stopped because ' + curr.user.username + ' left :joy_cat:';
     return acc;
   }, '');
+};
+
+var broadCastCaptainsReady = exports.broadCastCaptainsReady = function broadCastCaptainsReady(_ref5) {
+  var list = _ref5.list,
+      captains = _ref5.captains;
+
+  var pugCaptains = captains.reduce(function (acc, curr, index) {
+    acc += '<@' + curr.id + '> is the captain for **' + _constants.teams['team_' + index] + '**\n';
+    return acc;
+  }, '');
+
+  var _list$reduce = list.reduce(function (acc, curr, index) {
+    if (curr.captain === null) acc.players += '**' + (index + 1) + '**) *' + curr.username + '*  ';
+    return acc;
+  }, { players: 'Players: ' }),
+      players = _list$reduce.players;
+
+  return pugCaptains + '\n\n' + players;
 };
 //# sourceMappingURL=formats.js.map

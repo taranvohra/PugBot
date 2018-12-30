@@ -55,13 +55,11 @@ var _util = require('./util');
 
 var _constants = require('./constants');
 
-var _events = require('events');
+var _pugEvent = require('./pugEvent');
 
-var _events2 = _interopRequireDefault(_events);
+var _pugEvent2 = _interopRequireDefault(_pugEvent);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var eventEmitter = new _events2.default.EventEmitter();
 
 var addGameType = exports.addGameType = function () {
   var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(_ref, Pugs) {
@@ -337,6 +335,7 @@ var Pug = exports.Pug = function () {
     this.pickingOrder = pickingOrder;
     this.picking = false;
     this.list = [];
+    this.captains = [];
     this.teams = {};
     this.captainTimer = null;
   }
@@ -348,22 +347,21 @@ var Pug = exports.Pug = function () {
 
       this.picking = true;
       this.captainTimer = setTimeout(function () {
-        var present = _this.list.reduce(function (acc, _ref14) {
-          var captain = _ref14.captain;
-          return captain !== null ? ++acc : acc;
-        }, 0);
-        for (var i = 0; i < noTeams - present; i++) {
+        var present = _this.captains.length;
+        for (var i = 0; i < _this.noTeams - present; i++) {
           while (1) {
-            var pIndex = (0, _util.getRandomInt)(0, noPlayers - 1);
-            if (_this.list[pIndex]['captain'] !== null) {
+            var pIndex = (0, _util.getRandomInt)(0, _this.noPlayers - 1);
+            if (_this.list[pIndex]['captain'] === null) {
               _this.list[pIndex]['captain'] = i;
+              _this.captains.push(_this.list[pIndex]);
               break;
             }
           }
         }
-
-        eventEmitter.emit(_constants.pugEvents.captainsReady, _this.discriminator);
-      }, 30000);
+        console.log('1');
+        _pugEvent2.default.emit(_constants.pugEvents.captainsReady, _this.discriminator);
+        console.log('2');
+      }, 5000);
     }
   }, {
     key: 'stopPug',
@@ -372,6 +370,7 @@ var Pug = exports.Pug = function () {
       this.list.forEach(function (user) {
         return user.captain = null;
       });
+      this.cleanup();
     }
   }, {
     key: 'addPlayer',
@@ -402,7 +401,7 @@ var Pug = exports.Pug = function () {
   }, {
     key: 'cleanup',
     value: function cleanup() {
-      this.captainTimer ? clearInterval(this.captainTimer) : null;
+      clearTimeout(this.captainTimer);
     }
   }]);
   return Pug;

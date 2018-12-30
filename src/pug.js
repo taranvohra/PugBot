@@ -3,9 +3,7 @@ import { getPickingOrder } from './helpers';
 import cloneDeep from 'lodash/cloneDeep';
 import { getRandomInt } from './util';
 import { pugEvents } from './constants';
-import events from 'events';
-
-const eventEmitter = new events.EventEmitter();
+import pugEventEmitter from './pugEvent';
 
 export const addGameType = async (
   [_, gameName, noPlayers, noTeams, uid],
@@ -192,22 +190,19 @@ export class Pug {
   fillPug() {
     this.picking = true;
     this.captainTimer = setTimeout(() => {
-      const present = this.list.reduce(
-        (acc, { captain }) => (captain !== null ? ++acc : acc),
-        0
-      );
-      for (let i = 0; i < noTeams - present; i++) {
+      const present = this.captains.length;
+      for (let i = 0; i < this.noTeams - present; i++) {
         while (1) {
-          const pIndex = getRandomInt(0, noPlayers - 1);
-          if (this.list[pIndex]['captain'] !== null) {
+          const pIndex = getRandomInt(0, this.noPlayers - 1);
+          if (this.list[pIndex]['captain'] === null) {
             this.list[pIndex]['captain'] = i;
             this.captains.push(this.list[pIndex]);
             break;
           }
         }
       }
-      eventEmitter.emit(pugEvents.captainsReady, this.discriminator);
-    }, 30000);
+      pugEventEmitter.emit(pugEvents.captainsReady, this.discriminator);
+    }, 5000);
   }
 
   stopPug() {
@@ -236,6 +231,6 @@ export class Pug {
   }
 
   cleanup() {
-    clearInterval(this.captainTimer);
+    clearTimeout(this.captainTimer);
   }
 }

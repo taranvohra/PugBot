@@ -18,13 +18,13 @@ var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
 var _discord = require('discord.js');
 
-var _events = require('events');
-
-var _events2 = _interopRequireDefault(_events);
-
 var _dotenv = require('dotenv');
 
 var _dotenv2 = _interopRequireDefault(_dotenv);
+
+var _pugEvent = require('./pugEvent');
+
+var _pugEvent2 = _interopRequireDefault(_pugEvent);
 
 var _constants = require('./constants');
 
@@ -54,7 +54,6 @@ _dotenv2.default.config();
 var cachedDB = {};
 var PugList = {};
 
-var eventEmitter = new _events2.default.EventEmitter();
 var disabledEvents = ['TYPING_START', 'CHANNEL_UPDATE', 'USER_UPDATE'];
 var bot = new _discord.Client({ disabledEvents: disabledEvents });
 
@@ -64,7 +63,7 @@ bot.on('ready', function () {
 
 bot.on('message', function () {
   var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(message) {
-    var _cachedDB, _cachedDB$Servers, serversObj, _cachedDB$Pugs, Pugs, _cachedDB$Channel, Channel, user, args, action, roles, channelId, result, Servers, _Servers, _result, _Servers2, _result2, _Servers3, _result3, _result4, _result5, _joinGameType, status, _result6, msg, filledPugs, forBroadcast, _leaveGameType2, _status, _result7, _msg, deadPugs, _listAvailablePugs, _status2, _result8, _msg2;
+    var _cachedDB, _cachedDB$Servers, serversObj, _cachedDB$Pugs, Pugs, user, args, action, roles, channelId, result, Servers, _Servers, _result, _Servers2, _result2, _Servers3, _result3, _result4, _result5, _joinGameType, status, _result6, msg, filledPugs, forBroadcast, _leaveGameType2, _status, _result7, _msg, deadPugs, _listAvailablePugs, _status2, _result8, _msg2;
 
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
@@ -86,7 +85,7 @@ bot.on('message', function () {
             return _context.abrupt('return');
 
           case 4:
-            _cachedDB = cachedDB, _cachedDB$Servers = _cachedDB.Servers, serversObj = _cachedDB$Servers === undefined ? {} : _cachedDB$Servers, _cachedDB$Pugs = _cachedDB.Pugs, Pugs = _cachedDB$Pugs === undefined ? {} : _cachedDB$Pugs, _cachedDB$Channel = _cachedDB.Channel, Channel = _cachedDB$Channel === undefined ? '' : _cachedDB$Channel;
+            _cachedDB = cachedDB, _cachedDB$Servers = _cachedDB.Servers, serversObj = _cachedDB$Servers === undefined ? {} : _cachedDB$Servers, _cachedDB$Pugs = _cachedDB.Pugs, Pugs = _cachedDB$Pugs === undefined ? {} : _cachedDB$Pugs;
             user = {
               id: message.author.id,
               username: (0, _helpers.fixSpecialCharactersInName)(message.author.username)
@@ -280,5 +279,12 @@ var revisePugList = function revisePugList(discriminator, pug, action) {
   Events emitted for pugs
 */
 
-eventEmitter.on(_constants.pugEvents.captainsReady, function (discriminator) {});
+_pugEvent2.default.on(_constants.pugEvents.captainsReady, function (discriminator) {
+  var _cachedDB2 = cachedDB,
+      _cachedDB2$Channel = _cachedDB2.Channel,
+      Channel = _cachedDB2$Channel === undefined ? {} : _cachedDB2$Channel;
+
+  var pug = PugList[discriminator];
+  bot.channels.get(Channel.preferredChannel).send((0, _formats.broadCastCaptainsReady)(pug)).catch(console.error + ':broadCastCaptains:');
+});
 //# sourceMappingURL=bot.js.map
