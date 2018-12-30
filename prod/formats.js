@@ -3,7 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.broadCastCaptainsReady = exports.broadCastDeadPugs = exports.broadCastFilledPugs = exports.printPugStatuses = exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printServerList = exports.printServerStatus = undefined;
+exports.printPickStatus = exports.broadCastCaptainsReady = exports.broadCastDeadPugs = exports.broadCastFilledPugs = exports.printPugStatuses = exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printServerList = exports.printServerStatus = undefined;
+
+var _values = require('babel-runtime/core-js/object/values');
+
+var _values2 = _interopRequireDefault(_values);
 
 var _keys = require('babel-runtime/core-js/object/keys');
 
@@ -179,7 +183,7 @@ var broadCastFilledPugs = exports.broadCastFilledPugs = function broadCastFilled
 
 var broadCastDeadPugs = exports.broadCastDeadPugs = function broadCastDeadPugs(deadPugs) {
   return deadPugs.reduce(function (acc, curr, i) {
-    acc += (i > 0 ? '\n' : '') + ' :joy_cat: **' + curr.discriminator.toUpperCase() + '** was stopped because ' + curr.user.username + ' left :joy_cat:';
+    acc += (i > 0 ? '\n' : '') + ' :joy_cat: **' + curr.discriminator.toUpperCase() + '** was stopped because **' + curr.user.username + '** left :joy_cat:';
     return acc;
   }, '');
 };
@@ -192,6 +196,7 @@ var broadCastCaptainsReady = exports.broadCastCaptainsReady = function broadCast
     acc += '<@' + curr.id + '> is the captain for **' + _constants.teams['team_' + index] + '**\n';
     return acc;
   }, '');
+  var turn = '<@' + captains[0]['id'] + '> pick one for **' + _constants.teams['team_0'] + '**';
 
   var _list$reduce = list.reduce(function (acc, curr, index) {
     if (curr.captain === null) acc.players += '**' + (index + 1) + '**) *' + curr.username + '*  ';
@@ -199,6 +204,39 @@ var broadCastCaptainsReady = exports.broadCastCaptainsReady = function broadCast
   }, { players: 'Players: ' }),
       players = _list$reduce.players;
 
-  return pugCaptains + '\n\n' + players;
+  return pugCaptains + '\n' + turn + '\n' + players;
+};
+
+var printPickStatus = exports.printPickStatus = function printPickStatus(_ref6) {
+  var pug = _ref6.pug,
+      pickedPlayers = _ref6.pickedPlayers,
+      picking = _ref6.picking;
+
+  var picked = pickedPlayers.reduce(function (acc, curr) {
+    acc += '<@' + curr.player.id + '> was picked for **' + _constants.teams['team_' + curr.team] + '**\n';
+    return acc;
+  }, '');
+
+  var next = pug.captains[pug.pickingOrder[pug.turn]];
+  var turn = picking ? '<@' + next.id + '> pick one for **' + _constants.teams['team_' + next.team] + '**' : '**Picking has finished**';
+
+  var pugTeams = Array(pug.noTeams).fill(0).reduce(function (acc, curr, i) {
+    acc[i] = '**' + _constants.teams['team_' + i] + '**: ';
+    return acc;
+  }, {});
+
+  var _pug$list$reduce = pug.list.reduce(function (acc, curr, index) {
+    if (curr.team === null) acc.players += '**' + (index + 1) + '**) *' + curr.username + '*  ';else acc.currTeams[curr.team] += '*' + curr.username + '*  ';
+    return acc;
+  }, { players: 'Players: ', currTeams: pugTeams }),
+      players = _pug$list$reduce.players,
+      currTeams = _pug$list$reduce.currTeams;
+
+  var activeTeams = (0, _values2.default)(currTeams).reduce(function (acc, curr) {
+    acc += curr + '\n';
+    return acc;
+  }, '');
+
+  return picked + '\n' + turn + '\n' + (picking ? players : '') + '\n' + activeTeams;
 };
 //# sourceMappingURL=formats.js.map

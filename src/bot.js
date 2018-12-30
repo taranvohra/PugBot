@@ -14,6 +14,7 @@ import {
   joinGameType,
   leaveGameType,
   listAvailablePugs,
+  pickPugPlayer,
 } from './pug';
 import {
   printServerStatus,
@@ -24,6 +25,7 @@ import {
   broadCastFilledPugs,
   broadCastDeadPugs,
   broadCastCaptainsReady,
+  printPickStatus,
 } from './formats';
 import { checkIfRoleIsPrivileged, fixSpecialCharactersInName } from './helpers';
 import { createSortedArrayFromObject } from './util';
@@ -134,9 +136,9 @@ bot.on('message', async message => {
 
       const forBroadcast = filledPugs.map(pug => {
         if (pug.list.length === pug.noPlayers) {
-          Object.values(PugList).forEach(ap => {
-            if (pug.discriminator !== ap.discriminator)
-              pug.list.forEach(user => {
+          const allLeaveMsgs = Object.values(PugList).reduce((acc, ap) => {
+            if (pug.discriminator !== ap.discriminator) {
+              const allPugLeaveMsgs = pug.list.reduce((prev, user) => {
                 const { result } = leaveGameType(
                   ['l', ap.discriminator],
                   user,
@@ -149,10 +151,16 @@ bot.on('message', async message => {
                     result[0].pug,
                     result[0].pug.list.length === 0 ? 'remove' : 'update'
                   );
-                  message.channel.send(printPugLeaveStatus(result));
+                  const msg = printPugLeaveStatus(result);
+                  prev += `${msg} `;
                 }
-              });
-          });
+                return prev;
+              }, ``);
+              acc += `${allPugLeaveMsgs} \n`;
+            }
+            return acc;
+          }, ``);
+          allLeaveMsgs && message.channel.send(allLeaveMsgs);
           return pug;
         }
       });
@@ -193,6 +201,17 @@ bot.on('message', async message => {
         .catch(console.error + ':list:');
       break;
     }
+
+    case commands.pickplayer.includes(action): {
+      const { status, result, msg } = pickPugPlayer(args, user, PugList);
+      message.channel
+        .send(
+          status
+            ? printPickStatus(result)
+            : msg || `**${result.pickedPlayers.username}** is already picked`
+        )
+        .catch(console.error + ':pick:');
+    }
     default:
       console.log('no match');
   }
@@ -214,7 +233,6 @@ const revisePugList = (discriminator, pug, action) => {
 /*
   Events emitted for pugs
 */
-
 pugEventEmitter.on(pugEvents.captainsReady, discriminator => {
   const { Channel = {} } = cachedDB;
   const pug = PugList[discriminator];

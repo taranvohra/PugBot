@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Pug = exports.listAvailablePugs = exports.leaveGameType = exports.joinGameType = exports.delGameType = exports.addGameType = undefined;
+exports.Pug = exports.pickPugPlayer = exports.listAvailablePugs = exports.leaveGameType = exports.joinGameType = exports.delGameType = exports.addGameType = undefined;
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
@@ -319,13 +319,38 @@ var listAvailablePugs = exports.listAvailablePugs = function listAvailablePugs(_
   }
 };
 
+var pickPugPlayer = exports.pickPugPlayer = function pickPugPlayer(_ref13, user, PugList) {
+  var _ref14 = (0, _slicedToArray3.default)(_ref13, 2),
+      _ = _ref14[0],
+      playerIndex = _ref14[1];
+
+  if (!playerIndex) return;
+
+  var _Object$values$filter = (0, _values2.default)(PugList).filter(function (p) {
+    return p.picking && p.list.some(function (u) {
+      return u.id === user.id && u.captain !== null && u.team === p.pickingOrder[p.turn];
+    });
+  }),
+      _Object$values$filter2 = (0, _slicedToArray3.default)(_Object$values$filter, 1),
+      activePug = _Object$values$filter2[0];
+
+  if (!activePug) return { status: false, msg: 'Invalid' };
+  if (activePug.captains.length !== activePug.noTeams) return { status: false, msg: 'Please wait for all captains to be picked' };
+  if (playerIndex < 1 || playerIndex > activePug.list.length) return { status: false, msg: 'Invalid pick' };
+
+  var pug = (0, _cloneDeep2.default)(activePug);
+  var res = pug.pickPlayer(playerIndex - 1, pug.pickingOrder[pug.turn]);
+  var result = (0, _extends3.default)({ pug: pug }, res);
+  return { status: result.picked, result: result };
+};
+
 var Pug = exports.Pug = function () {
-  function Pug(_ref13) {
-    var discriminator = _ref13.discriminator,
-        gameName = _ref13.gameName,
-        noPlayers = _ref13.noPlayers,
-        noTeams = _ref13.noTeams,
-        pickingOrder = _ref13.pickingOrder;
+  function Pug(_ref15) {
+    var discriminator = _ref15.discriminator,
+        gameName = _ref15.gameName,
+        noPlayers = _ref15.noPlayers,
+        noTeams = _ref15.noTeams,
+        pickingOrder = _ref15.pickingOrder;
     (0, _classCallCheck3.default)(this, Pug);
 
     this.discriminator = discriminator;
@@ -333,10 +358,10 @@ var Pug = exports.Pug = function () {
     this.noPlayers = noPlayers;
     this.noTeams = noTeams;
     this.pickingOrder = pickingOrder;
+    this.turn = 0;
     this.picking = false;
     this.list = [];
     this.captains = [];
-    this.teams = {};
     this.captainTimer = null;
   }
 
@@ -352,23 +377,22 @@ var Pug = exports.Pug = function () {
           while (1) {
             var pIndex = (0, _util.getRandomInt)(0, _this.noPlayers - 1);
             if (_this.list[pIndex]['captain'] === null) {
-              _this.list[pIndex]['captain'] = i;
+              _this.list[pIndex]['captain'] = _this.list[pIndex]['team'] = i;
               _this.captains.push(_this.list[pIndex]);
               break;
             }
           }
         }
-        console.log('1');
         _pugEvent2.default.emit(_constants.pugEvents.captainsReady, _this.discriminator);
-        console.log('2');
       }, 5000);
     }
   }, {
     key: 'stopPug',
     value: function stopPug() {
       this.picking = false;
+      this.turn = 0;
       this.list.forEach(function (user) {
-        return user.captain = null;
+        return user.captain = user.team = user.pick = null;
       });
       this.cleanup();
     }
@@ -379,7 +403,7 @@ var Pug = exports.Pug = function () {
         if (this.list.findIndex(function (u) {
           return u.id === user.id;
         }) > -1) return 2;
-        this.list.push((0, _extends3.default)({ team: null, captain: null }, user));
+        this.list.push((0, _extends3.default)({ team: null, captain: null, pick: null }, user));
         this.list.length === this.noPlayers ? this.fillPug() : null;
         return 1;
       }
@@ -392,6 +416,40 @@ var Pug = exports.Pug = function () {
       if (this.picking) this.stopPug();
     }
   }, {
+    key: 'pickPlayer',
+    value: function pickPlayer(pIndex, team) {
+      if (this.list[pIndex]['team'] === null) {
+        this.list[pIndex]['team'] = team;
+        this.turn += 1;
+        this.list[pIndex]['pick'] = this.turn;
+
+        var pickedPlayers = [{ player: this.list[pIndex], team: team }];
+        // last pick automatically goes
+        if (this.turn === this.pickingOrder.length - 1) {
+          var lastPlayerIndex = this.list.findIndex(function (u) {
+            return u.team === null;
+          });
+          var lastPlayerTeam = this.pickingOrder[this.turn];
+
+          this.list[lastPlayerIndex]['team'] = lastPlayerTeam;
+          this.turn += 1;
+          this.list[lastPlayerIndex]['pick'] = this.turn;
+          // pug ended
+          this.picking = false;
+          pickedPlayers.push({
+            player: this.list[lastPlayerIndex],
+            team: lastPlayerTeam
+          });
+        }
+        return { picked: true, pickedPlayers: pickedPlayers, picking: this.picking };
+      }
+      return {
+        picked: false,
+        pickedPlayers: this.list[pIndex],
+        finished: this.picking
+      };
+    }
+  }, {
     key: 'findPlayer',
     value: function findPlayer(user) {
       return this.list.findIndex(function (u) {
@@ -401,6 +459,7 @@ var Pug = exports.Pug = function () {
   }, {
     key: 'cleanup',
     value: function cleanup() {
+      this.picking = false;
       clearTimeout(this.captainTimer);
     }
   }]);

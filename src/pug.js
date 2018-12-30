@@ -173,6 +173,31 @@ export const listAvailablePugs = ([action, forGame, ...args], PugList) => {
   }
 };
 
+export const pickPugPlayer = ([_, playerIndex], user, PugList) => {
+  if (!playerIndex) return;
+  const [activePug] = Object.values(PugList).filter(
+    p =>
+      p.picking &&
+      p.list.some(
+        u =>
+          u.id === user.id &&
+          u.captain !== null &&
+          u.team === p.pickingOrder[p.turn]
+      )
+  );
+
+  if (!activePug) return { status: false, msg: `Invalid` };
+  if (activePug.captains.length !== activePug.noTeams)
+    return { status: false, msg: `Please wait for all captains to be picked` };
+  if (playerIndex < 1 || playerIndex > activePug.list.length)
+    return { status: false, msg: `Invalid pick` };
+
+  const pug = cloneDeep(activePug);
+  const res = pug.pickPlayer(playerIndex - 1, pug.pickingOrder[pug.turn]);
+  const result = { pug, ...res };
+  return { status: result.picked, result };
+};
+
 export class Pug {
   constructor({ discriminator, gameName, noPlayers, noTeams, pickingOrder }) {
     this.discriminator = discriminator;
@@ -180,10 +205,10 @@ export class Pug {
     this.noPlayers = noPlayers;
     this.noTeams = noTeams;
     this.pickingOrder = pickingOrder;
+    this.turn = 0;
     this.picking = false;
     this.list = [];
     this.captains = [];
-    this.teams = {};
     this.captainTimer = null;
   }
 
@@ -195,7 +220,7 @@ export class Pug {
         while (1) {
           const pIndex = getRandomInt(0, this.noPlayers - 1);
           if (this.list[pIndex]['captain'] === null) {
-            this.list[pIndex]['captain'] = i;
+            this.list[pIndex]['captain'] = this.list[pIndex]['team'] = i;
             this.captains.push(this.list[pIndex]);
             break;
           }
@@ -207,14 +232,15 @@ export class Pug {
 
   stopPug() {
     this.picking = false;
-    this.list.forEach(user => (user.captain = null));
+    this.turn = 0;
+    this.list.forEach(user => (user.captain = user.team = user.pick = null));
     this.cleanup();
   }
 
   addPlayer(user) {
     if (!this.picking) {
       if (this.list.findIndex(u => u.id === user.id) > -1) return 2;
-      this.list.push({ team: null, captain: null, ...user });
+      this.list.push({ team: null, captain: null, pick: null, ...user });
       this.list.length === this.noPlayers ? this.fillPug() : null;
       return 1;
     }
@@ -226,11 +252,43 @@ export class Pug {
     if (this.picking) this.stopPug();
   }
 
+  pickPlayer(pIndex, team) {
+    if (this.list[pIndex]['team'] === null) {
+      this.list[pIndex]['team'] = team;
+      this.turn += 1;
+      this.list[pIndex]['pick'] = this.turn;
+
+      const pickedPlayers = [{ player: this.list[pIndex], team }];
+      // last pick automatically goes
+      if (this.turn === this.pickingOrder.length - 1) {
+        const lastPlayerIndex = this.list.findIndex(u => u.team === null);
+        const lastPlayerTeam = this.pickingOrder[this.turn];
+
+        this.list[lastPlayerIndex]['team'] = lastPlayerTeam;
+        this.turn += 1;
+        this.list[lastPlayerIndex]['pick'] = this.turn;
+        // pug ended
+        this.picking = false;
+        pickedPlayers.push({
+          player: this.list[lastPlayerIndex],
+          team: lastPlayerTeam,
+        });
+      }
+      return { picked: true, pickedPlayers, picking: this.picking };
+    }
+    return {
+      picked: false,
+      pickedPlayers: this.list[pIndex],
+      finished: this.picking,
+    };
+  }
+
   findPlayer(user) {
     return this.list.findIndex(u => u.id === user.id);
   }
 
   cleanup() {
+    this.picking = false;
     clearTimeout(this.captainTimer);
   }
 }

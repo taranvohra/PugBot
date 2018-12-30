@@ -200,6 +200,7 @@ export const broadCastCaptainsReady = ({ list, captains }) => {
     acc += `<@${curr.id}> is the captain for **${teams[`team_${index}`]}**\n`;
     return acc;
   }, ``);
+  const turn = `<@${captains[0]['id']}> pick one for **${teams[`team_0`]}**`;
   const { players } = list.reduce(
     (acc, curr, index) => {
       if (curr.captain === null)
@@ -208,5 +209,43 @@ export const broadCastCaptainsReady = ({ list, captains }) => {
     },
     { players: `Players: ` }
   );
-  return `${pugCaptains}\n\n${players}`;
+  return `${pugCaptains}\n${turn}\n${players}`;
+};
+
+export const printPickStatus = ({ pug, pickedPlayers, picking }) => {
+  const picked = pickedPlayers.reduce((acc, curr) => {
+    acc += `<@${curr.player.id}> was picked for **${
+      teams[`team_${curr.team}`]
+    }**\n`;
+    return acc;
+  }, ``);
+
+  const next = pug.captains[pug.pickingOrder[pug.turn]];
+  const turn = picking
+    ? `<@${next.id}> pick one for **${teams[`team_${next.team}`]}**`
+    : `**Picking has finished**`;
+
+  const pugTeams = Array(pug.noTeams)
+    .fill(0)
+    .reduce((acc, curr, i) => {
+      acc[i] = `**${teams[`team_${i}`]}**: `;
+      return acc;
+    }, {});
+
+  const { players, currTeams } = pug.list.reduce(
+    (acc, curr, index) => {
+      if (curr.team === null)
+        acc.players += `**${index + 1}**) *${curr.username}*  `;
+      else acc.currTeams[curr.team] += `*${curr.username}*  `;
+      return acc;
+    },
+    { players: `Players: `, currTeams: pugTeams }
+  );
+
+  const activeTeams = Object.values(currTeams).reduce((acc, curr) => {
+    acc += `${curr}\n`;
+    return acc;
+  }, ``);
+
+  return `${picked}\n${turn}\n${picking ? `${players}\n` : ``}\n${activeTeams}`;
 };

@@ -12,6 +12,7 @@ export const commands = {
   joingametype: ['j', 'join'],
   leavegametype: ['lva', 'l', 'leave'],
   listgametype: ['lsa', 'ls', 'list'],
+  pickplayer: ['p', 'pick'],
 };
 
 export const teams = {
