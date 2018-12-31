@@ -378,6 +378,7 @@ var Pug = exports.Pug = function () {
             var pIndex = (0, _util.getRandomInt)(0, _this.noPlayers - 1);
             if (_this.list[pIndex]['captain'] === null) {
               _this.list[pIndex]['captain'] = _this.list[pIndex]['team'] = i;
+              _this.list[pIndex]['pick'] = 0;
               _this.captains.push(_this.list[pIndex]);
               break;
             }

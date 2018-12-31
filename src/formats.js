@@ -232,6 +232,7 @@ export const printPickStatus = ({ pug, pickedPlayers, picking }) => {
       return acc;
     }, {});
 
+  pug.list.sort((a, b) => a.pick - b.pick);
   const { players, currTeams } = pug.list.reduce(
     (acc, curr, index) => {
       if (curr.team === null)

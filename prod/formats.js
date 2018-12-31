@@ -225,6 +225,10 @@ var printPickStatus = exports.printPickStatus = function printPickStatus(_ref6) 
     return acc;
   }, {});
 
+  pug.list.sort(function (a, b) {
+    return a.pick - b.pick;
+  });
+
   var _pug$list$reduce = pug.list.reduce(function (acc, curr, index) {
     if (curr.team === null) acc.players += '**' + (index + 1) + '**) *' + curr.username + '*  ';else acc.currTeams[curr.team] += '*' + curr.username + '*  ';
     return acc;

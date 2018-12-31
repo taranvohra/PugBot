@@ -221,6 +221,7 @@ export class Pug {
           const pIndex = getRandomInt(0, this.noPlayers - 1);
           if (this.list[pIndex]['captain'] === null) {
             this.list[pIndex]['captain'] = this.list[pIndex]['team'] = i;
+            this.list[pIndex]['pick'] = 0;
             this.captains.push(this.list[pIndex]);
             break;
           }
