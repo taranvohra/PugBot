@@ -60,6 +60,17 @@ export const joinGameType = ([_, ...args], user, Pugs, PugList) => {
     if (args.length === 0)
       return { status: false, result: [], msg: 'Invalid command' };
 
+    const isPartOfFilledPug = Object.values(PugList).some(
+      p => p.picking && p.list.some(u => u.id === user.id)
+    );
+
+    if (isPartOfFilledPug)
+      return {
+        status: false,
+        result: [],
+        msg: 'Cannot join another pug when you are a part of a filled pug',
+      };
+
     const result = args.map(g => {
       const game = g.toLowerCase(); // game is basically the discriminator
 

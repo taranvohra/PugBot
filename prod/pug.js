@@ -196,6 +196,18 @@ var joinGameType = exports.joinGameType = function joinGameType(_ref7, user, Pug
   try {
     if (args.length === 0) return { status: false, result: [], msg: 'Invalid command' };
 
+    var isPartOfFilledPug = (0, _values2.default)(PugList).some(function (p) {
+      return p.picking && p.list.some(function (u) {
+        return u.id === user.id;
+      });
+    });
+
+    if (isPartOfFilledPug) return {
+      status: false,
+      result: [],
+      msg: 'Cannot join another pug when you are a part of a filled pug'
+    };
+
     var result = args.map(function (g) {
       var game = g.toLowerCase(); // game is basically the discriminator
 
