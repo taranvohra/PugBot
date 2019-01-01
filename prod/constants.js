@@ -17,7 +17,8 @@ var commands = exports.commands = {
   joingametype: ['j', 'join'],
   leavegametype: ['lva', 'l', 'leave'],
   listgametype: ['lsa', 'ls', 'list'],
-  pickplayer: ['p', 'pick']
+  pickplayer: ['p', 'pick'],
+  captain: ['captain']
 };
 
 var teams = exports.teams = {

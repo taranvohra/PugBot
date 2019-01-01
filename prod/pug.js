@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Pug = exports.pickPugPlayer = exports.listAvailablePugs = exports.leaveGameType = exports.joinGameType = exports.delGameType = exports.addGameType = undefined;
+exports.Pug = exports.addCaptain = exports.pickPugPlayer = exports.listAvailablePugs = exports.leaveGameType = exports.joinGameType = exports.delGameType = exports.addGameType = undefined;
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
@@ -336,24 +336,65 @@ var pickPugPlayer = exports.pickPugPlayer = function pickPugPlayer(_ref13, user,
       _ = _ref14[0],
       playerIndex = _ref14[1];
 
-  if (!playerIndex) return;
+  try {
+    if (!playerIndex) return;
 
-  var _Object$values$filter = (0, _values2.default)(PugList).filter(function (p) {
-    return p.picking && p.list.some(function (u) {
-      return u.id === user.id && u.captain !== null && u.team === p.pickingOrder[p.turn];
-    });
-  }),
-      _Object$values$filter2 = (0, _slicedToArray3.default)(_Object$values$filter, 1),
-      activePug = _Object$values$filter2[0];
+    var _Object$values$reduce = (0, _values2.default)(PugList).reduce(function (acc, p) {
+      if (p.picking) {
+        var presentUser = p.list.filter(function (u) {
+          return u.id === user.id && u.captain !== null;
+        });
+        if (presentUser[0]) {
+          acc.activePug = p;
+          acc.team = presentUser[0].team;
+        }
+      }
+      return acc;
+    }, { activePug: null, team: null }),
+        activePug = _Object$values$reduce.activePug,
+        team = _Object$values$reduce.team;
 
-  if (!activePug) return { status: false, msg: 'Invalid' };
-  if (activePug.captains.length !== activePug.noTeams) return { status: false, msg: 'Please wait for all captains to be picked' };
-  if (playerIndex < 1 || playerIndex > activePug.list.length) return { status: false, msg: 'Invalid pick' };
+    if (!activePug) return { status: false, msg: 'Invalid' };
+    if (activePug.captains.length !== activePug.noTeams) return {
+      status: false,
+      msg: 'Please wait for all captains to be picked'
+    };
 
-  var pug = (0, _cloneDeep2.default)(activePug);
-  var res = pug.pickPlayer(playerIndex - 1, pug.pickingOrder[pug.turn]);
-  var result = (0, _extends3.default)({ pug: pug }, res);
-  return { status: result.picked, result: result };
+    if (team !== activePug.pickingOrder[activePug.turn]) return { status: false, msg: 'Please wait for your turn' };
+
+    if (playerIndex < 1 || playerIndex > activePug.list.length) return { status: false, msg: 'Invalid pick' };
+
+    var pug = (0, _cloneDeep2.default)(activePug);
+    PugList[pug.discriminator].cleanup();
+    var res = pug.pickPlayer(playerIndex - 1, pug.pickingOrder[pug.turn]);
+    var result = (0, _extends3.default)({ pug: pug }, res);
+    return { status: result.picked, result: result };
+  } catch (error) {
+    console.log(error);
+    return { status: false, msg: 'Something went wrong' };
+  }
+};
+
+var addCaptain = exports.addCaptain = function addCaptain(user, PugList) {
+  try {
+    var _Object$values$filter = (0, _values2.default)(PugList).filter(function (p) {
+      return p.picking && p.captains.length !== p.noTeams && p.list.some(function (u) {
+        return u.id === user.id && u.captain === null;
+      });
+    }),
+        _Object$values$filter2 = (0, _slicedToArray3.default)(_Object$values$filter, 1),
+        activePug = _Object$values$filter2[0];
+
+    if (!activePug) return { status: false, msg: 'Invalid' };
+    var pug = (0, _cloneDeep2.default)(activePug);
+    PugList[pug.discriminator].cleanup();
+    var res = pug.addCaptain(user);
+    var result = (0, _extends3.default)({ pug: pug }, res);
+    return { status: result.captained, result: result };
+  } catch (error) {
+    console.log(error);
+    return { status: false, msg: 'Something went wrong' };
+  }
 };
 
 var Pug = exports.Pug = function () {
@@ -397,7 +438,7 @@ var Pug = exports.Pug = function () {
           }
         }
         _pugEvent2.default.emit(_constants.pugEvents.captainsReady, _this.discriminator);
-      }, 5000);
+      }, 30000);
     }
   }, {
     key: 'stopPug',
@@ -427,6 +468,27 @@ var Pug = exports.Pug = function () {
     value: function removePlayer(index) {
       this.list.splice(index, 1);
       if (this.picking) this.stopPug();
+    }
+  }, {
+    key: 'addCaptain',
+    value: function addCaptain(user) {
+      var pIndex = this.list.findIndex(function (u) {
+        return u.id === user.id;
+      });
+      if (pIndex > -1) {
+        var length = this.captains.push(this.list[pIndex]);
+        this.list[pIndex]['captain'] = this.list[pIndex]['team'] = length - 1;
+        this.list[pIndex]['pick'] = 0;
+
+        if (this.captains.length === this.noTeams) clearTimeout(this.captainTimer);
+
+        return {
+          captained: true,
+          team: length - 1,
+          captainsReady: this.captains.length === this.noTeams
+        };
+      }
+      return { captained: false };
     }
   }, {
     key: 'pickPlayer',

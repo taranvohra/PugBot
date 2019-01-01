@@ -15,6 +15,7 @@ import {
   leaveGameType,
   listAvailablePugs,
   pickPugPlayer,
+  addCaptain,
 } from './pug';
 import {
   printServerStatus,
@@ -26,6 +27,7 @@ import {
   broadCastDeadPugs,
   broadCastCaptainsReady,
   printPickStatus,
+  printAddCaptainStatus,
 } from './formats';
 import { checkIfRoleIsPrivileged, fixSpecialCharactersInName } from './helpers';
 import { createSortedArrayFromObject } from './util';
@@ -204,6 +206,13 @@ bot.on('message', async message => {
 
     case commands.pickplayer.includes(action): {
       const { status, result, msg } = pickPugPlayer(args, user, PugList);
+      status
+        ? revisePugList(
+            result.pug.discriminator,
+            result.pug,
+            !result.picking ? 'remove' : 'update'
+          )
+        : null;
       message.channel
         .send(
           status
@@ -211,9 +220,25 @@ bot.on('message', async message => {
             : msg || `**${result.pickedPlayers.username}** is already picked`
         )
         .catch(console.error + ':pick:');
-      !result.picking
-        ? revisePugList(result.pug.discriminator, result.pug, 'remove')
-        : ``;
+      break;
+    }
+
+    case commands.captain.includes(action): {
+      const { status, result, msg } = addCaptain(user, PugList);
+      status
+        ? revisePugList(result.pug.discriminator, result.pug, 'update')
+        : null;
+      await message.channel
+        .send(status ? printAddCaptainStatus(user, result) : msg)
+        .catch(console.error + ':pick:');
+
+      status && result.captainsReady
+        ? pugEventEmitter.emit(
+            pugEvents.captainsReady,
+            result.pug.discriminator
+          )
+        : null;
+      break;
     }
     default:
       console.log('no match');

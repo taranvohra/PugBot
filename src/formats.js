@@ -250,3 +250,9 @@ export const printPickStatus = ({ pug, pickedPlayers, picking }) => {
 
   return `${picked}\n${turn}\n${picking ? `${players}\n` : ``}\n${activeTeams}`;
 };
+
+export const printAddCaptainStatus = (user, { pug, team }) => {
+  return `**${user.username}** became captain for **${teams[
+    `team_${team}`
+  ].toUpperCase()}**`;
+};

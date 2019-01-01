@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.printPickStatus = exports.broadCastCaptainsReady = exports.broadCastDeadPugs = exports.broadCastFilledPugs = exports.printPugStatuses = exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printServerList = exports.printServerStatus = undefined;
+exports.printAddCaptainStatus = exports.printPickStatus = exports.broadCastCaptainsReady = exports.broadCastDeadPugs = exports.broadCastFilledPugs = exports.printPugStatuses = exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printServerList = exports.printServerStatus = undefined;
 
 var _values = require('babel-runtime/core-js/object/values');
 
@@ -242,5 +242,12 @@ var printPickStatus = exports.printPickStatus = function printPickStatus(_ref6) 
   }, '');
 
   return picked + '\n' + turn + '\n' + (picking ? players + '\n' : '') + '\n' + activeTeams;
+};
+
+var printAddCaptainStatus = exports.printAddCaptainStatus = function printAddCaptainStatus(user, _ref7) {
+  var pug = _ref7.pug,
+      team = _ref7.team;
+
+  return '**' + user.username + '** became captain for **' + _constants.teams['team_' + team].toUpperCase() + '**';
 };
 //# sourceMappingURL=formats.js.map

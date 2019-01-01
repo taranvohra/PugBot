@@ -13,6 +13,7 @@ export const commands = {
   leavegametype: ['lva', 'l', 'leave'],
   listgametype: ['lsa', 'ls', 'list'],
   pickplayer: ['p', 'pick'],
+  captain: ['captain'],
 };
 
 export const teams = {

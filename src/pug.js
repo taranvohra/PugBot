@@ -185,28 +185,66 @@ export const listAvailablePugs = ([action, forGame, ...args], PugList) => {
 };
 
 export const pickPugPlayer = ([_, playerIndex], user, PugList) => {
-  if (!playerIndex) return;
-  const [activePug] = Object.values(PugList).filter(
-    p =>
-      p.picking &&
-      p.list.some(
-        u =>
-          u.id === user.id &&
-          u.captain !== null &&
-          u.team === p.pickingOrder[p.turn]
-      )
-  );
+  try {
+    if (!playerIndex) return;
+    const { activePug, team } = Object.values(PugList).reduce(
+      (acc, p) => {
+        if (p.picking) {
+          const presentUser = p.list.filter(
+            u => u.id === user.id && u.captain !== null
+          );
+          if (presentUser[0]) {
+            acc.activePug = p;
+            acc.team = presentUser[0].team;
+          }
+        }
+        return acc;
+      },
+      { activePug: null, team: null }
+    );
 
-  if (!activePug) return { status: false, msg: `Invalid` };
-  if (activePug.captains.length !== activePug.noTeams)
-    return { status: false, msg: `Please wait for all captains to be picked` };
-  if (playerIndex < 1 || playerIndex > activePug.list.length)
-    return { status: false, msg: `Invalid pick` };
+    if (!activePug) return { status: false, msg: `Invalid` };
+    if (activePug.captains.length !== activePug.noTeams)
+      return {
+        status: false,
+        msg: `Please wait for all captains to be picked`,
+      };
 
-  const pug = cloneDeep(activePug);
-  const res = pug.pickPlayer(playerIndex - 1, pug.pickingOrder[pug.turn]);
-  const result = { pug, ...res };
-  return { status: result.picked, result };
+    if (team !== activePug.pickingOrder[activePug.turn])
+      return { status: false, msg: `Please wait for your turn` };
+
+    if (playerIndex < 1 || playerIndex > activePug.list.length)
+      return { status: false, msg: `Invalid pick` };
+
+    const pug = cloneDeep(activePug);
+    PugList[pug.discriminator].cleanup();
+    const res = pug.pickPlayer(playerIndex - 1, pug.pickingOrder[pug.turn]);
+    const result = { pug, ...res };
+    return { status: result.picked, result };
+  } catch (error) {
+    console.log(error);
+    return { status: false, msg: 'Something went wrong' };
+  }
+};
+
+export const addCaptain = (user, PugList) => {
+  try {
+    const [activePug] = Object.values(PugList).filter(
+      p =>
+        p.picking &&
+        p.captains.length !== p.noTeams &&
+        p.list.some(u => u.id === user.id && u.captain === null)
+    );
+    if (!activePug) return { status: false, msg: `Invalid` };
+    const pug = cloneDeep(activePug);
+    PugList[pug.discriminator].cleanup();
+    const res = pug.addCaptain(user);
+    const result = { pug, ...res };
+    return { status: result.captained, result };
+  } catch (error) {
+    console.log(error);
+    return { status: false, msg: 'Something went wrong' };
+  }
 };
 
 export class Pug {
@@ -239,7 +277,7 @@ export class Pug {
         }
       }
       pugEventEmitter.emit(pugEvents.captainsReady, this.discriminator);
-    }, 5000);
+    }, 30000);
   }
 
   stopPug() {
@@ -262,6 +300,25 @@ export class Pug {
   removePlayer(index) {
     this.list.splice(index, 1);
     if (this.picking) this.stopPug();
+  }
+
+  addCaptain(user) {
+    const pIndex = this.list.findIndex(u => u.id === user.id);
+    if (pIndex > -1) {
+      const length = this.captains.push(this.list[pIndex]);
+      this.list[pIndex]['captain'] = this.list[pIndex]['team'] = length - 1;
+      this.list[pIndex]['pick'] = 0;
+
+      if (this.captains.length === this.noTeams)
+        clearTimeout(this.captainTimer);
+
+      return {
+        captained: true,
+        team: length - 1,
+        captainsReady: this.captains.length === this.noTeams,
+      };
+    }
+    return { captained: false };
   }
 
   pickPlayer(pIndex, team) {

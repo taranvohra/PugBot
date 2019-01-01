@@ -63,7 +63,7 @@ bot.on('ready', function () {
 
 bot.on('message', function () {
   var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(message) {
-    var _cachedDB, _cachedDB$Servers, serversObj, _cachedDB$Pugs, Pugs, user, args, action, roles, channelId, result, Servers, _Servers, _result, _Servers2, _result2, _Servers3, _result3, _result4, _result5, _joinGameType, status, _result6, msg, filledPugs, forBroadcast, _leaveGameType2, _status, _result7, _msg2, deadPugs, _listAvailablePugs, _status2, _result8, _msg3, _pickPugPlayer, _status3, _result9, _msg4;
+    var _cachedDB, _cachedDB$Servers, serversObj, _cachedDB$Pugs, Pugs, user, args, action, roles, channelId, result, Servers, _Servers, _result, _Servers2, _result2, _Servers3, _result3, _result4, _result5, _joinGameType, status, _result6, msg, filledPugs, forBroadcast, _leaveGameType2, _status, _result7, _msg2, deadPugs, _listAvailablePugs, _status2, _result8, _msg3, _pickPugPlayer, _status3, _result9, _msg4, _addCaptain, _status4, _result10, _msg5;
 
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
@@ -94,7 +94,7 @@ bot.on('message', function () {
             action = args[0].toLowerCase();
             roles = message.member.roles;
             _context.t0 = true;
-            _context.next = _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.setchannel.includes(action)) ? 12 : _context.t0 === _constants.commands.servers.includes(action) ? 19 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.addqueryserver.includes(action)) ? 22 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.delqueryserver.includes(action)) ? 29 : _context.t0 === _constants.commands.queryut99server.includes(action) ? 36 : _context.t0 === _constants.commands.addgametype.includes(action) ? 42 : _context.t0 === _constants.commands.delgametype.includes(action) ? 48 : _context.t0 === _constants.commands.joingametype.includes(action) ? 54 : _context.t0 === _constants.commands.leavegametype.includes(action) ? 60 : _context.t0 === _constants.commands.listgametype.includes(action) ? 65 : _context.t0 === _constants.commands.pickplayer.includes(action) ? 68 : 71;
+            _context.next = _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.setchannel.includes(action)) ? 12 : _context.t0 === _constants.commands.servers.includes(action) ? 19 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.addqueryserver.includes(action)) ? 22 : _context.t0 === ((0, _helpers.checkIfRoleIsPrivileged)(roles) && _constants.commands.delqueryserver.includes(action)) ? 29 : _context.t0 === _constants.commands.queryut99server.includes(action) ? 36 : _context.t0 === _constants.commands.addgametype.includes(action) ? 42 : _context.t0 === _constants.commands.delgametype.includes(action) ? 48 : _context.t0 === _constants.commands.joingametype.includes(action) ? 54 : _context.t0 === _constants.commands.leavegametype.includes(action) ? 60 : _context.t0 === _constants.commands.listgametype.includes(action) ? 65 : _context.t0 === _constants.commands.pickplayer.includes(action) ? 68 : _context.t0 === _constants.commands.captain.includes(action) ? 72 : 78;
             break;
 
           case 12:
@@ -107,13 +107,13 @@ bot.on('message', function () {
 
             result.status ? updateCache('Servers', result.cache) : '';
             message.channel.send(result.msg);
-            return _context.abrupt('break', 72);
+            return _context.abrupt('break', 79);
 
           case 19:
             Servers = (0, _util.createSortedArrayFromObject)(serversObj, 'timestamp');
 
             message.channel.send((0, _formats.printServerList)(Servers)).catch(console.error + ':list:');
-            return _context.abrupt('break', 72);
+            return _context.abrupt('break', 79);
 
           case 22:
             _Servers = (0, _util.createSortedArrayFromObject)(serversObj);
@@ -125,7 +125,7 @@ bot.on('message', function () {
 
             _result.status ? updateCache('Servers', _result.cache) : '';
             message.channel.send(_result.msg);
-            return _context.abrupt('break', 72);
+            return _context.abrupt('break', 79);
 
           case 29:
             _Servers2 = (0, _util.createSortedArrayFromObject)(serversObj);
@@ -137,7 +137,7 @@ bot.on('message', function () {
 
             _result2.status ? updateCache('Servers', _result2.cache) : '';
             message.channel.send(_result2.msg);
-            return _context.abrupt('break', 72);
+            return _context.abrupt('break', 79);
 
           case 36:
             _Servers3 = (0, _util.createSortedArrayFromObject)(serversObj, 'timestamp');
@@ -148,7 +148,7 @@ bot.on('message', function () {
             _result3 = _context.sent;
 
             message.channel.send(_result3.status ? (0, _formats.printServerStatus)(_result3) : _result3.msg).catch(console.error + ':query:');
-            return _context.abrupt('break', 72);
+            return _context.abrupt('break', 79);
 
           case 42:
             _context.next = 44;
@@ -159,7 +159,7 @@ bot.on('message', function () {
 
             _result4.status ? updateCache('Pugs', _result4.cache) : '';
             message.channel.send(_result4.msg);
-            return _context.abrupt('break', 72);
+            return _context.abrupt('break', 79);
 
           case 48:
             _context.next = 50;
@@ -170,7 +170,7 @@ bot.on('message', function () {
 
             _result5.status ? updateCache('Pugs', _result5.cache) : '';
             message.channel.send(_result5.msg);
-            return _context.abrupt('break', 72);
+            return _context.abrupt('break', 79);
 
           case 54:
             _joinGameType = (0, _pug.joinGameType)(args, user, Pugs, PugList), status = _joinGameType.status, _result6 = _joinGameType.result, msg = _joinGameType.msg;
@@ -212,7 +212,7 @@ bot.on('message', function () {
             });
 
             forBroadcast.length > 0 ? message.channel.send((0, _formats.broadCastFilledPugs)(forBroadcast)) : null;
-            return _context.abrupt('break', 72);
+            return _context.abrupt('break', 79);
 
           case 60:
             _leaveGameType2 = (0, _pug.leaveGameType)(args, user, Pugs, PugList), _status = _leaveGameType2.status, _result7 = _leaveGameType2.result, _msg2 = _leaveGameType2.msg;
@@ -229,24 +229,37 @@ bot.on('message', function () {
 
             message.channel.send(_status ? (0, _formats.printPugLeaveStatus)(_result7) : _msg2).catch(console.error + ':leave:');
             deadPugs.length > 0 ? message.channel.send((0, _formats.broadCastDeadPugs)(deadPugs)) : null;
-            return _context.abrupt('break', 72);
+            return _context.abrupt('break', 79);
 
           case 65:
             _listAvailablePugs = (0, _pug.listAvailablePugs)(args, PugList), _status2 = _listAvailablePugs.status, _result8 = _listAvailablePugs.result, _msg3 = _listAvailablePugs.msg;
 
             message.channel.send(_status2 ? (0, _formats.printPugStatuses)(_result8) : _msg3).catch(console.error + ':list:');
-            return _context.abrupt('break', 72);
+            return _context.abrupt('break', 79);
 
           case 68:
             _pickPugPlayer = (0, _pug.pickPugPlayer)(args, user, PugList), _status3 = _pickPugPlayer.status, _result9 = _pickPugPlayer.result, _msg4 = _pickPugPlayer.msg;
 
+            _status3 ? revisePugList(_result9.pug.discriminator, _result9.pug, !_result9.picking ? 'remove' : 'update') : null;
             message.channel.send(_status3 ? (0, _formats.printPickStatus)(_result9) : _msg4 || '**' + _result9.pickedPlayers.username + '** is already picked').catch(console.error + ':pick:');
-            !_result9.picking ? revisePugList(_result9.pug.discriminator, _result9.pug, 'remove') : '';
-
-          case 71:
-            console.log('no match');
+            return _context.abrupt('break', 79);
 
           case 72:
+            _addCaptain = (0, _pug.addCaptain)(user, PugList), _status4 = _addCaptain.status, _result10 = _addCaptain.result, _msg5 = _addCaptain.msg;
+
+            _status4 ? revisePugList(_result10.pug.discriminator, _result10.pug, 'update') : null;
+            _context.next = 76;
+            return message.channel.send(_status4 ? (0, _formats.printAddCaptainStatus)(user, _result10) : _msg5).catch(console.error + ':pick:');
+
+          case 76:
+
+            _status4 && _result10.captainsReady ? _pugEvent2.default.emit(_constants.pugEvents.captainsReady, _result10.pug.discriminator) : null;
+            return _context.abrupt('break', 79);
+
+          case 78:
+            console.log('no match');
+
+          case 79:
           case 'end':
             return _context.stop();
         }
