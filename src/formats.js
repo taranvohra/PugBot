@@ -168,7 +168,7 @@ export const printPugStatuses = statuses => {
     ``
   );
 
-  return msg || `There are currently no pugs :FeelsBadMan:, try joining one!`;
+  return msg || `There are currently no pugs :FeelsBadMan: , try joining one!`;
 };
 
 export const broadCastFilledPugs = filledPugs => {

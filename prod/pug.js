@@ -196,12 +196,14 @@ var joinGameType = exports.joinGameType = function joinGameType(_ref7, user, Pug
   try {
     if (args.length === 0) return { status: false, result: [], msg: 'Invalid command' };
 
+    console.log((0, _values2.default)(PugList));
     var isPartOfFilledPug = (0, _values2.default)(PugList).some(function (p) {
       return p.picking && p.list.some(function (u) {
         return u.id === user.id;
       });
     });
 
+    console.log(isPartOfFilledPug);
     if (isPartOfFilledPug) return {
       status: false,
       result: [],
@@ -386,8 +388,8 @@ var addCaptain = exports.addCaptain = function addCaptain(user, PugList) {
         activePug = _Object$values$filter2[0];
 
     if (!activePug) return { status: false, msg: 'Invalid' };
-    var pug = (0, _cloneDeep2.default)(activePug);
-    PugList[pug.discriminator].cleanup();
+    var pug = activePug;
+    // Not cloning here because of timeout
     var res = pug.addCaptain(user);
     var result = (0, _extends3.default)({ pug: pug }, res);
     return { status: result.captained, result: result };
@@ -425,8 +427,13 @@ var Pug = exports.Pug = function () {
 
       this.picking = true;
       this.captainTimer = setTimeout(function () {
-        var present = _this.captains.length;
-        for (var i = 0; i < _this.noTeams - present; i++) {
+        var present = _this.captains.reduce(function (acc, _, i) {
+          _this.captains[i] ? acc[i] = true : null;
+          return acc;
+        }, {});
+
+        for (var i = 0; i < _this.noTeams; i++) {
+          if (present[i]) continue;
           while (1) {
             var pIndex = (0, _util.getRandomInt)(0, _this.noPlayers - 1);
             if (_this.list[pIndex]['captain'] === null) {
@@ -438,7 +445,7 @@ var Pug = exports.Pug = function () {
           }
         }
         _pugEvent2.default.emit(_constants.pugEvents.captainsReady, _this.discriminator);
-      }, 30000);
+      }, 15000);
     }
   }, {
     key: 'stopPug',

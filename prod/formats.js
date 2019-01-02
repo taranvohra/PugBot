@@ -165,7 +165,7 @@ var printPugStatuses = exports.printPugStatuses = function printPugStatuses(stat
     }
   }, '');
 
-  return msg || 'There are currently no pugs :FeelsBadMan:, try joining one!';
+  return msg || 'There are currently no pugs :FeelsBadMan: , try joining one!';
 };
 
 var broadCastFilledPugs = exports.broadCastFilledPugs = function broadCastFilledPugs(filledPugs) {

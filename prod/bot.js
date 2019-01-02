@@ -105,7 +105,7 @@ bot.on('message', function () {
           case 15:
             result = _context.sent;
 
-            result.status ? updateCache('Servers', result.cache) : '';
+            result.status ? updateCache('Channel', result.cache) : '';
             message.channel.send(result.msg);
             return _context.abrupt('break', 79);
 

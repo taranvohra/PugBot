@@ -64,6 +64,7 @@ export const joinGameType = ([_, ...args], user, Pugs, PugList) => {
       p => p.picking && p.list.some(u => u.id === user.id)
     );
 
+    console.log(isPartOfFilledPug);
     if (isPartOfFilledPug)
       return {
         status: false,
@@ -236,8 +237,8 @@ export const addCaptain = (user, PugList) => {
         p.list.some(u => u.id === user.id && u.captain === null)
     );
     if (!activePug) return { status: false, msg: `Invalid` };
-    const pug = cloneDeep(activePug);
-    PugList[pug.discriminator].cleanup();
+    const pug = activePug;
+    // Not cloning here because of timeout
     const res = pug.addCaptain(user);
     const result = { pug, ...res };
     return { status: result.captained, result };
@@ -264,8 +265,13 @@ export class Pug {
   fillPug() {
     this.picking = true;
     this.captainTimer = setTimeout(() => {
-      const present = this.captains.length;
-      for (let i = 0; i < this.noTeams - present; i++) {
+      const present = this.captains.reduce((acc, _, i) => {
+        this.captains[i] ? (acc[i] = true) : null;
+        return acc;
+      }, {});
+
+      for (let i = 0; i < this.noTeams; i++) {
+        if (present[i]) continue;
         while (1) {
           const pIndex = getRandomInt(0, this.noPlayers - 1);
           if (this.list[pIndex]['captain'] === null) {
@@ -277,7 +283,7 @@ export class Pug {
         }
       }
       pugEventEmitter.emit(pugEvents.captainsReady, this.discriminator);
-    }, 30000);
+    }, 15000);
   }
 
   stopPug() {

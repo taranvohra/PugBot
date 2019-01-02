@@ -69,7 +69,7 @@ bot.on('message', async message => {
       commands.setchannel.includes(action): {
       const channelId = message.channel.id;
       const result = await setPreferredChannel(channelId);
-      result.status ? updateCache('Servers', result.cache) : '';
+      result.status ? updateCache('Channel', result.cache) : '';
       message.channel.send(result.msg);
       break;
     }
