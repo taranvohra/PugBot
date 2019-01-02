@@ -128,15 +128,22 @@ export const getTeamScores = (info, maxTeams) => {
  */
 export const getPickingOrder = (noPlayers, noTeams) => {
   if (noPlayers < noTeams || noPlayers % noTeams !== 0) return 0;
-  const pickingOrder = [];
   let idx = 0;
-  let shouldSwitch = -1;
+  let pickingOrder = [];
   let remainingPlayers = noPlayers - noTeams; // because captainsss
+  let wholeRound = []; // when all teams have got to pick atleast once
   while (remainingPlayers > 0) {
     pickingOrder.push(idx);
-    shouldSwitch = (shouldSwitch + 1) % 2;
-    idx = shouldSwitch === 0 ? (idx + 1) % noTeams : idx;
-    remainingPlayers--;
+    wholeRound.push(idx);
+    if (wholeRound.length === noTeams) {
+      pickingOrder = [...pickingOrder, ...wholeRound.reverse()];
+      wholeRound = [];
+      idx = 0;
+      remainingPlayers = remainingPlayers - noTeams - 1;
+    } else {
+      idx++;
+      remainingPlayers--;
+    }
   }
   return pickingOrder.length > 0 ? pickingOrder : [-1];
 };

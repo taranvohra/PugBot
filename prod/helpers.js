@@ -5,6 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.getTeamIndex = exports.getMinutesAndSeconds = exports.padNumberWithZero = exports.fixSpecialCharactersInName = exports.getPickingOrder = exports.getTeamScores = exports.getPlayerList = exports.checkIfRoleIsPrivileged = exports.createCacheFromSnapshot = exports.getUIDFromIndex = exports.getHostAndPortOfServerFromDB = exports.checkKeyExistenceFromIndex = exports.createObjectFromArray = exports.filterFalsyValues = exports.checkIfFinalPacket = undefined;
 
+var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
+
+var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+
 var _values = require('babel-runtime/core-js/object/values');
 
 var _values2 = _interopRequireDefault(_values);
@@ -143,15 +147,22 @@ var getTeamScores = exports.getTeamScores = function getTeamScores(info, maxTeam
  */
 var getPickingOrder = exports.getPickingOrder = function getPickingOrder(noPlayers, noTeams) {
   if (noPlayers < noTeams || noPlayers % noTeams !== 0) return 0;
-  var pickingOrder = [];
   var idx = 0;
-  var shouldSwitch = -1;
+  var pickingOrder = [];
   var remainingPlayers = noPlayers - noTeams; // because captainsss
+  var wholeRound = []; // when all teams have got to pick atleast once
   while (remainingPlayers > 0) {
     pickingOrder.push(idx);
-    shouldSwitch = (shouldSwitch + 1) % 2;
-    idx = shouldSwitch === 0 ? (idx + 1) % noTeams : idx;
-    remainingPlayers--;
+    wholeRound.push(idx);
+    if (wholeRound.length === noTeams) {
+      pickingOrder = [].concat((0, _toConsumableArray3.default)(pickingOrder), (0, _toConsumableArray3.default)(wholeRound.reverse()));
+      wholeRound = [];
+      idx = 0;
+      remainingPlayers = remainingPlayers - noTeams - 1;
+    } else {
+      idx++;
+      remainingPlayers--;
+    }
   }
   return pickingOrder.length > 0 ? pickingOrder : [-1];
 };
