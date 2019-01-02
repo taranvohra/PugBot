@@ -55,14 +55,28 @@ bot.on('message', async message => {
   if (!message.content.startsWith(prefix)) return;
 
   const { Servers: serversObj = {}, Pugs = {} } = cachedDB;
+
   const user = {
     id: message.author.id,
     username: fixSpecialCharactersInName(message.author.username),
   };
 
-  const args = message.content.substring(prefix.length).split(' ');
-  const action = args[0].toLowerCase();
+  const isUserMentioned = message.mentions.users.first();
+  const userMentioned = {
+    id: isUserMentioned && isUserMentioned.id,
+    username:
+      isUserMentioned && fixSpecialCharactersInName(isUserMentioned.username),
+  };
+
   const roles = message.member.roles;
+  const args = message.content
+    .substring(prefix.length)
+    .split(' ')
+    .filter(Boolean);
+  const action = args[0].toLowerCase();
+
+  const hasAdminCmd = commands.admincmds.includes(action);
+  const isValidAdminCmd = hasAdminCmd && checkIfRoleIsPrivileged(roles);
 
   switch (true) {
     case checkIfRoleIsPrivileged(roles) &&
@@ -124,7 +138,14 @@ bot.on('message', async message => {
     }
 
     case commands.joingametype.includes(action): {
-      const { status, result, msg } = joinGameType(args, user, Pugs, PugList);
+      if (hasAdminCmd && !isValidAdminCmd) break;
+
+      const { status, result, msg } = joinGameType(
+        isValidAdminCmd ? args.slice(1) : args,
+        isValidAdminCmd ? userMentioned : user,
+        Pugs,
+        PugList
+      );
       const filledPugs = result.reduce((acc, { pug, discriminator }) => {
         if (pug) {
           revisePugList(discriminator, pug, 'update');
@@ -207,7 +228,14 @@ bot.on('message', async message => {
     }
 
     case commands.pickplayer.includes(action): {
-      const { status, result, msg } = pickPugPlayer(args, user, PugList);
+      if (hasAdminCmd && !isValidAdminCmd) break;
+
+      const { status, result, msg } = pickPugPlayer(
+        isValidAdminCmd ? args.slice(1) : args,
+        isValidAdminCmd ? userMentioned : user,
+        PugList
+      );
+
       status
         ? revisePugList(
             result.pug.discriminator,
@@ -243,9 +271,6 @@ bot.on('message', async message => {
       break;
     }
 
-    case commands.adminadd.includes(action): {
-      const { status, result, msg } = addCaptain(user, PugList);
-    }
     default:
       console.log('no match');
   }

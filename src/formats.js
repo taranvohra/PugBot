@@ -104,7 +104,9 @@ export const printPugJoinStatus = statuses => {
           acc.joined += `**${discriminator.toUpperCase()}** (${activeCount}/${noPlayers}) :small_blue_diamond: `;
           break;
         case 2:
-          acc.aj += `You have already joined **${discriminator.toUpperCase()}**`;
+          acc.aj += `**${
+            user.username
+          }** has already joined **${discriminator.toUpperCase()}**`;
           break;
         default:
           null;
@@ -232,16 +234,17 @@ export const printPickStatus = ({ pug, pickedPlayers, picking }) => {
       return acc;
     }, {});
 
-  pug.list.sort((a, b) => a.pick - b.pick);
-  const { players, currTeams } = pug.list.reduce(
-    (acc, curr, index) => {
-      if (curr.team === null)
-        acc.players += `**${index + 1}**) *${curr.username}*  `;
-      else acc.currTeams[curr.team] += `*${curr.username}*  `;
+  const players = pug.list.reduce((acc, curr, index) => {
+    if (curr.team === null) acc += `**${index + 1}**) *${curr.username}*  `;
+    return acc;
+  }, `Players: `);
+
+  const currTeams = [...pug.list]
+    .sort((a, b) => a.pick - b.pick)
+    .reduce((acc, curr) => {
+      if (curr.team !== null) acc[curr.team] += `*${curr.username}*  `;
       return acc;
-    },
-    { players: `Players: `, currTeams: pugTeams }
-  );
+    }, pugTeams);
 
   const activeTeams = Object.values(currTeams).reduce((acc, curr) => {
     acc += `${curr}\n`;

@@ -9,12 +9,12 @@ export const commands = {
   servers: ['servers'],
   addgametype: ['addgametype', 'agm'],
   delgametype: ['delgametype', 'dgm'],
-  joingametype: ['j', 'join'],
+  joingametype: ['j', 'join', 'adminadd'],
   leavegametype: ['lva', 'l', 'leave'],
   listgametype: ['lsa', 'ls', 'list'],
-  pickplayer: ['p', 'pick'],
+  pickplayer: ['p', 'pick', 'adminpick'],
   captain: ['captain'],
-  adminadd: ['adminadd'],
+  admincmds: ['adminadd', 'adminpick', 'adminremove'],
 };
 
 export const teams = {

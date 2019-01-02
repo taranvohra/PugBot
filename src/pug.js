@@ -60,6 +60,9 @@ export const joinGameType = ([_, ...args], user, Pugs, PugList) => {
     if (args.length === 0)
       return { status: false, result: [], msg: 'Invalid command' };
 
+    if (!user.id)
+      return { status: false, result: [], msg: 'No user was mentioned' };
+
     const isPartOfFilledPug = Object.values(PugList).some(
       p => p.picking && p.list.some(u => u.id === user.id)
     );
@@ -218,7 +221,10 @@ export const pickPugPlayer = ([_, playerIndex], user, PugList) => {
 
     const pug = cloneDeep(activePug);
     PugList[pug.discriminator].cleanup();
-    const res = pug.pickPlayer(playerIndex - 1, pug.pickingOrder[pug.turn]);
+    const res = pug.pickPlayer(
+      parseInt(playerIndex) - 1,
+      pug.pickingOrder[pug.turn]
+    );
     const result = { pug, ...res };
     return { status: result.picked, result };
   } catch (error) {

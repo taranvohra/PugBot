@@ -196,6 +196,8 @@ var joinGameType = exports.joinGameType = function joinGameType(_ref7, user, Pug
   try {
     if (args.length === 0) return { status: false, result: [], msg: 'Invalid command' };
 
+    if (!user.id) return { status: false, result: [], msg: 'No user was mentioned' };
+
     var isPartOfFilledPug = (0, _values2.default)(PugList).some(function (p) {
       return p.picking && p.list.some(function (u) {
         return u.id === user.id;
@@ -366,7 +368,7 @@ var pickPugPlayer = exports.pickPugPlayer = function pickPugPlayer(_ref13, user,
 
     var pug = (0, _cloneDeep2.default)(activePug);
     PugList[pug.discriminator].cleanup();
-    var res = pug.pickPlayer(playerIndex - 1, pug.pickingOrder[pug.turn]);
+    var res = pug.pickPlayer(parseInt(playerIndex) - 1, pug.pickingOrder[pug.turn]);
     var result = (0, _extends3.default)({ pug: pug }, res);
     return { status: result.picked, result: result };
   } catch (error) {

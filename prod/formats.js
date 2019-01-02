@@ -9,6 +9,10 @@ var _values = require('babel-runtime/core-js/object/values');
 
 var _values2 = _interopRequireDefault(_values);
 
+var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
+
+var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
@@ -105,7 +109,7 @@ var printPugJoinStatus = exports.printPugJoinStatus = function printPugJoinStatu
         acc.joined += '**' + discriminator.toUpperCase() + '** (' + activeCount + '/' + noPlayers + ') :small_blue_diamond: ';
         break;
       case 2:
-        acc.aj += 'You have already joined **' + discriminator.toUpperCase() + '**';
+        acc.aj += '**' + user.username + '** has already joined **' + discriminator.toUpperCase() + '**';
         break;
       default:
         null;
@@ -225,16 +229,17 @@ var printPickStatus = exports.printPickStatus = function printPickStatus(_ref6) 
     return acc;
   }, {});
 
-  pug.list.sort(function (a, b) {
-    return a.pick - b.pick;
-  });
-
-  var _pug$list$reduce = pug.list.reduce(function (acc, curr, index) {
-    if (curr.team === null) acc.players += '**' + (index + 1) + '**) *' + curr.username + '*  ';else acc.currTeams[curr.team] += '*' + curr.username + '*  ';
+  var players = pug.list.reduce(function (acc, curr, index) {
+    if (curr.team === null) acc += '**' + (index + 1) + '**) *' + curr.username + '*  ';
     return acc;
-  }, { players: 'Players: ', currTeams: pugTeams }),
-      players = _pug$list$reduce.players,
-      currTeams = _pug$list$reduce.currTeams;
+  }, 'Players: ');
+
+  var currTeams = [].concat((0, _toConsumableArray3.default)(pug.list)).sort(function (a, b) {
+    return a.pick - b.pick;
+  }).reduce(function (acc, curr) {
+    if (curr.team !== null) acc[curr.team] += '*' + curr.username + '*  ';
+    return acc;
+  }, pugTeams);
 
   var activeTeams = (0, _values2.default)(currTeams).reduce(function (acc, curr) {
     acc += curr + '\n';
