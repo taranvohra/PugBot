@@ -64,7 +64,6 @@ export const joinGameType = ([_, ...args], user, Pugs, PugList) => {
       p => p.picking && p.list.some(u => u.id === user.id)
     );
 
-    console.log(isPartOfFilledPug);
     if (isPartOfFilledPug)
       return {
         status: false,
@@ -128,7 +127,7 @@ export const leaveGameType = ([action, ...args], user, Pugs, PugList) => {
         if (playerIndex > -1) {
           pug.removePlayer(playerIndex);
 
-          PugList[game] && PugList[game].cleanup(); // because we have cloned p and will no longer be using it
+          PugList[game].cleanup(); // because we have cloned p and will no longer be using it
           return { pug, user, discriminator: pug.discriminator };
         }
         return {};

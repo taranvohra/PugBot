@@ -137,19 +137,19 @@ bot.on('message', async message => {
         .catch(console.error + ':join:');
 
       const forBroadcast = filledPugs.map(pug => {
-        if (pug.list.length === pug.noPlayers) {
-          const allLeaveMsgs = Object.values(PugList).reduce((acc, ap) => {
-            if (pug.discriminator !== ap.discriminator) {
+        if (PugList[pug.discriminator].picking) {
+          const allLeaveMsgs = Object.values(PugList).reduce((acc, op) => {
+            if (pug.discriminator !== op.discriminator) {
               const allPugLeaveMsgs = pug.list.reduce((prev, user) => {
                 const { result } = leaveGameType(
-                  ['l', ap.discriminator],
+                  ['l', op.discriminator],
                   user,
                   Pugs,
                   PugList
                 );
                 if (result[0].pug) {
                   revisePugList(
-                    ap.discriminator,
+                    op.discriminator,
                     result[0].pug,
                     result[0].pug.list.length === 0 ? 'remove' : 'update'
                   );
@@ -167,7 +167,9 @@ bot.on('message', async message => {
         }
       });
       forBroadcast.length > 0
-        ? message.channel.send(broadCastFilledPugs(forBroadcast))
+        ? message.channel.send(
+            broadCastFilledPugs(forBroadcast.filter(Boolean))
+          )
         : null;
       break;
     }
@@ -239,6 +241,10 @@ bot.on('message', async message => {
           )
         : null;
       break;
+    }
+
+    case commands.adminadd.includes(action): {
+      const { status, result, msg } = addCaptain(user, PugList);
     }
     default:
       console.log('no match');

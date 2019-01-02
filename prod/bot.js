@@ -188,15 +188,17 @@ bot.on('message', function () {
             message.channel.send(status ? (0, _formats.printPugJoinStatus)(_result6) : msg).catch(console.error + ':join:');
 
             forBroadcast = filledPugs.map(function (pug) {
-              if (pug.list.length === pug.noPlayers) {
-                var allLeaveMsgs = (0, _values2.default)(PugList).reduce(function (acc, ap) {
-                  if (pug.discriminator !== ap.discriminator) {
+              if (PugList[pug.discriminator].picking) {
+                console.log('1one');
+                var allLeaveMsgs = (0, _values2.default)(PugList).reduce(function (acc, op) {
+                  console.log(op.discriminator);
+                  if (pug.discriminator !== op.discriminator) {
                     var allPugLeaveMsgs = pug.list.reduce(function (prev, user) {
-                      var _leaveGameType = (0, _pug.leaveGameType)(['l', ap.discriminator], user, Pugs, PugList),
+                      var _leaveGameType = (0, _pug.leaveGameType)(['l', op.discriminator], user, Pugs, PugList),
                           result = _leaveGameType.result;
 
                       if (result[0].pug) {
-                        revisePugList(ap.discriminator, result[0].pug, result[0].pug.list.length === 0 ? 'remove' : 'update');
+                        revisePugList(op.discriminator, result[0].pug, result[0].pug.list.length === 0 ? 'remove' : 'update');
                         var _msg = (0, _formats.printPugLeaveStatus)(result);
                         prev += _msg + ' ';
                       }
@@ -211,7 +213,7 @@ bot.on('message', function () {
               }
             });
 
-            forBroadcast.length > 0 ? message.channel.send((0, _formats.broadCastFilledPugs)(forBroadcast)) : null;
+            forBroadcast.length > 0 ? message.channel.send((0, _formats.broadCastFilledPugs)(forBroadcast.filter(Boolean))) : null;
             return _context.abrupt('break', 79);
 
           case 60:

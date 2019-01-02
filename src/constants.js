@@ -14,6 +14,7 @@ export const commands = {
   listgametype: ['lsa', 'ls', 'list'],
   pickplayer: ['p', 'pick'],
   captain: ['captain'],
+  adminadd: ['adminadd'],
 };
 
 export const teams = {

@@ -196,14 +196,12 @@ var joinGameType = exports.joinGameType = function joinGameType(_ref7, user, Pug
   try {
     if (args.length === 0) return { status: false, result: [], msg: 'Invalid command' };
 
-    console.log((0, _values2.default)(PugList));
     var isPartOfFilledPug = (0, _values2.default)(PugList).some(function (p) {
       return p.picking && p.list.some(function (u) {
         return u.id === user.id;
       });
     });
 
-    console.log(isPartOfFilledPug);
     if (isPartOfFilledPug) return {
       status: false,
       result: [],
@@ -269,7 +267,7 @@ var leaveGameType = exports.leaveGameType = function leaveGameType(_ref9, user, 
         if (playerIndex > -1) {
           pug.removePlayer(playerIndex);
 
-          PugList[game] && PugList[game].cleanup(); // because we have cloned p and will no longer be using it
+          PugList[game].cleanup(); // because we have cloned p and will no longer be using it
           return { pug: pug, user: user, discriminator: pug.discriminator };
         }
         return {};
