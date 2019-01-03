@@ -1,4 +1,4 @@
-import { Client } from 'discord.js';
+import { Client, Presence, Message, TextChannel, User } from 'discord.js';
 import dotenv from 'dotenv';
 import pugEventEmitter from './pugEvent';
 import { prefix, commands, pugEvents } from './constants';
@@ -50,7 +50,39 @@ bot.on('ready', () => {
   console.log('ready');
 });
 
-bot.on('message', async message => {
+bot.on(
+  'presenceUpdate',
+  (_, { user, guild: { channels }, presence: { status } }) => {
+    if (status === 'offline') {
+      if (
+        Object.values(PugList).some(p => p.list.some(u => u.id === user.id))
+      ) {
+        const { Channel = {} } = cachedDB;
+        const channel = channels.get(Channel.preferredChannel);
+        const channeluser = new User(bot, {
+          bot: false,
+          id: user.id,
+          username: user.username,
+        });
+        const message = new Message(
+          channel,
+          {
+            author: channeluser,
+            attachments: new Map(),
+            embeds: [],
+            content: `${prefix}lva`,
+          },
+          bot
+        );
+        onMessage(message);
+      }
+    }
+  }
+);
+
+bot.on('message', onMessage);
+
+async function onMessage(message) {
   if (message.author.equals(bot.user)) return;
   if (!message.content.startsWith(prefix)) return;
 
@@ -274,7 +306,14 @@ bot.on('message', async message => {
     default:
       console.log('no match');
   }
-});
+}
+
+/**
+ * C A C H E
+ *    S E T U P
+ *       A N D
+ *         M A N I P U L A T I O N
+ */
 
 (async () => {
   cachedDB = await API.getCopyOfDB(`/`);
@@ -282,16 +321,16 @@ bot.on('message', async message => {
 })();
 
 const updateCache = (toUpdate, newCache) => (cachedDB[toUpdate] = newCache);
-
 const revisePugList = (discriminator, pug, action) => {
   if (action === 'update') PugList[discriminator] = pug;
   else if (action === 'remove' && PugList[discriminator])
     delete PugList[discriminator];
 };
 
-/*
-  Events emitted for pugs
-*/
+/**
+ * P U G
+ *    E V E N T S
+ */
 pugEventEmitter.on(pugEvents.captainsReady, discriminator => {
   const { Channel = {} } = cachedDB;
   const pug = PugList[discriminator];

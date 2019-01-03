@@ -8,62 +8,21 @@ var _extends2 = require('babel-runtime/helpers/extends');
 
 var _extends3 = _interopRequireDefault(_extends2);
 
-var _values = require('babel-runtime/core-js/object/values');
-
-var _values2 = _interopRequireDefault(_values);
-
 var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
-var _discord = require('discord.js');
+var _map = require('babel-runtime/core-js/map');
 
-var _dotenv = require('dotenv');
+var _map2 = _interopRequireDefault(_map);
 
-var _dotenv2 = _interopRequireDefault(_dotenv);
+var _values = require('babel-runtime/core-js/object/values');
 
-var _pugEvent = require('./pugEvent');
+var _values2 = _interopRequireDefault(_values);
 
-var _pugEvent2 = _interopRequireDefault(_pugEvent);
-
-var _constants = require('./constants');
-
-var _ut99query = require('./ut99query');
-
-var _pug = require('./pug');
-
-var _formats = require('./formats');
-
-var _helpers = require('./helpers');
-
-var _util = require('./util');
-
-var _api = require('./api');
-
-var _api2 = _interopRequireDefault(_api);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-_dotenv2.default.config();
-
-/**
- * PugList is list of pugs active at any moment on the server
- * Pugs are the pug(s)/gametype(s) registered on the server with their props
- */
-
-var cachedDB = {};
-var PugList = {};
-
-var disabledEvents = ['TYPING_START', 'CHANNEL_UPDATE', 'USER_UPDATE'];
-var bot = new _discord.Client({ disabledEvents: disabledEvents });
-
-bot.on('ready', function () {
-  console.log('ready');
-});
-
-bot.on('message', function () {
-  var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(message) {
-    var _cachedDB, _cachedDB$Servers, serversObj, _cachedDB$Pugs, Pugs, user, isUserMentioned, userMentioned, roles, args, action, hasAdminCmd, isValidAdminCmd, channelId, result, Servers, _Servers, _result, _Servers2, _result2, _Servers3, _result3, _result4, _result5, _joinGameType, status, _result6, msg, filledPugs, forBroadcast, _leaveGameType2, _status, _result7, _msg2, deadPugs, _listAvailablePugs, _status2, _result8, _msg3, _pickPugPlayer, _status3, _result9, _msg4, _addCaptain, _status4, _result10, _msg5;
+var onMessage = function () {
+  var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(message) {
+    var _cachedDB2, _cachedDB2$Servers, serversObj, _cachedDB2$Pugs, Pugs, user, isUserMentioned, userMentioned, roles, args, action, hasAdminCmd, isValidAdminCmd, channelId, result, Servers, _Servers, _result, _Servers2, _result2, _Servers3, _result3, _result4, _result5, _joinGameType, status, _result6, msg, filledPugs, forBroadcast, _leaveGameType2, _status, _result7, _msg2, deadPugs, _listAvailablePugs, _status2, _result8, _msg3, _pickPugPlayer, _status3, _result9, _msg4, _addCaptain, _status4, _result10, _msg5;
 
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
@@ -85,7 +44,7 @@ bot.on('message', function () {
             return _context.abrupt('return');
 
           case 4:
-            _cachedDB = cachedDB, _cachedDB$Servers = _cachedDB.Servers, serversObj = _cachedDB$Servers === undefined ? {} : _cachedDB$Servers, _cachedDB$Pugs = _cachedDB.Pugs, Pugs = _cachedDB$Pugs === undefined ? {} : _cachedDB$Pugs;
+            _cachedDB2 = cachedDB, _cachedDB2$Servers = _cachedDB2.Servers, serversObj = _cachedDB2$Servers === undefined ? {} : _cachedDB2$Servers, _cachedDB2$Pugs = _cachedDB2.Pugs, Pugs = _cachedDB2$Pugs === undefined ? {} : _cachedDB2$Pugs;
             user = {
               id: message.author.id,
               username: (0, _helpers.fixSpecialCharactersInName)(message.author.username)
@@ -189,9 +148,9 @@ bot.on('message', function () {
 
           case 60:
             _joinGameType = (0, _pug.joinGameType)(isValidAdminCmd ? args.slice(1) : args, isValidAdminCmd ? userMentioned : user, Pugs, PugList), status = _joinGameType.status, _result6 = _joinGameType.result, msg = _joinGameType.msg;
-            filledPugs = _result6.reduce(function (acc, _ref2) {
-              var pug = _ref2.pug,
-                  discriminator = _ref2.discriminator;
+            filledPugs = _result6.reduce(function (acc, _ref3) {
+              var pug = _ref3.pug,
+                  discriminator = _ref3.discriminator;
 
               if (pug) {
                 revisePugList(discriminator, pug, 'update');
@@ -231,9 +190,9 @@ bot.on('message', function () {
 
           case 66:
             _leaveGameType2 = (0, _pug.leaveGameType)(args, user, Pugs, PugList), _status = _leaveGameType2.status, _result7 = _leaveGameType2.result, _msg2 = _leaveGameType2.msg;
-            deadPugs = _result7.reduce(function (acc, _ref3) {
-              var pug = _ref3.pug,
-                  discriminator = _ref3.discriminator;
+            deadPugs = _result7.reduce(function (acc, _ref4) {
+              var pug = _ref4.pug,
+                  discriminator = _ref4.discriminator;
 
               if (pug) {
                 revisePugList(discriminator, pug, pug.list.length === 0 ? 'remove' : 'update');
@@ -288,13 +247,99 @@ bot.on('message', function () {
             return _context.stop();
         }
       }
-    }, _callee, undefined);
+    }, _callee, this);
   }));
 
-  return function (_x) {
-    return _ref.apply(this, arguments);
+  return function onMessage(_x) {
+    return _ref2.apply(this, arguments);
   };
-}());
+}();
+
+/**
+ * C A C H E
+ *    S E T U P
+ *       A N D
+ *         M A N I P U L A T I O N
+ */
+
+var _discord = require('discord.js');
+
+var _dotenv = require('dotenv');
+
+var _dotenv2 = _interopRequireDefault(_dotenv);
+
+var _pugEvent = require('./pugEvent');
+
+var _pugEvent2 = _interopRequireDefault(_pugEvent);
+
+var _constants = require('./constants');
+
+var _ut99query = require('./ut99query');
+
+var _pug = require('./pug');
+
+var _formats = require('./formats');
+
+var _helpers = require('./helpers');
+
+var _util = require('./util');
+
+var _api = require('./api');
+
+var _api2 = _interopRequireDefault(_api);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_dotenv2.default.config();
+
+/**
+ * PugList is list of pugs active at any moment on the server
+ * Pugs are the pug(s)/gametype(s) registered on the server with their props
+ */
+
+var cachedDB = {};
+var PugList = {};
+
+var disabledEvents = ['TYPING_START', 'CHANNEL_UPDATE', 'USER_UPDATE'];
+var bot = new _discord.Client({ disabledEvents: disabledEvents });
+
+bot.on('ready', function () {
+  console.log('ready');
+});
+
+bot.on('presenceUpdate', function (_, _ref) {
+  var user = _ref.user,
+      channels = _ref.guild.channels,
+      status = _ref.presence.status;
+
+  if (status === 'offline') {
+    if ((0, _values2.default)(PugList).some(function (p) {
+      return p.list.some(function (u) {
+        return u.id === user.id;
+      });
+    })) {
+      var _cachedDB = cachedDB,
+          _cachedDB$Channel = _cachedDB.Channel,
+          Channel = _cachedDB$Channel === undefined ? {} : _cachedDB$Channel;
+
+      var channel = channels.get(Channel.preferredChannel);
+      var channeluser = new _discord.User(bot, {
+        bot: false,
+        id: user.id,
+        username: user.username
+      });
+      var message = new _discord.Message(channel, {
+        author: channeluser,
+        attachments: new _map2.default(),
+        embeds: [],
+        content: _constants.prefix + 'lva'
+      }, bot);
+      onMessage(message);
+    }
+  }
+});
+
+bot.on('message', onMessage);
 
 (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
   return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -320,18 +365,18 @@ bot.on('message', function () {
 var updateCache = function updateCache(toUpdate, newCache) {
   return cachedDB[toUpdate] = newCache;
 };
-
 var revisePugList = function revisePugList(discriminator, pug, action) {
   if (action === 'update') PugList[discriminator] = pug;else if (action === 'remove' && PugList[discriminator]) delete PugList[discriminator];
 };
 
-/*
-  Events emitted for pugs
-*/
+/**
+ * P U G
+ *    E V E N T S
+ */
 _pugEvent2.default.on(_constants.pugEvents.captainsReady, function (discriminator) {
-  var _cachedDB2 = cachedDB,
-      _cachedDB2$Channel = _cachedDB2.Channel,
-      Channel = _cachedDB2$Channel === undefined ? {} : _cachedDB2$Channel;
+  var _cachedDB3 = cachedDB,
+      _cachedDB3$Channel = _cachedDB3.Channel,
+      Channel = _cachedDB3$Channel === undefined ? {} : _cachedDB3$Channel;
 
   var pug = PugList[discriminator];
   bot.channels.get(Channel.preferredChannel).send((0, _formats.broadCastCaptainsReady)(pug)).catch(console.error + ':broadCastCaptains:');
