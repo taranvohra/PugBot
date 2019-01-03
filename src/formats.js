@@ -125,7 +125,7 @@ export const printPugJoinStatus = statuses => {
   } ${nf.length > 0 ? `\n${nf}` : ``}`;
 };
 
-export const printPugLeaveStatus = statuses => {
+export const printPugLeaveStatus = (statuses, isOffline) => {
   const { left, nj, user } = statuses.reduce(
     (acc, { pug, user, discriminator }) => {
       if (pug) {
@@ -138,9 +138,13 @@ export const printPugLeaveStatus = statuses => {
     },
     { user: null, left: ``, nj: `` }
   );
-  const msg = `${left.length > 0 ? `${user.username} left  ${left}` : ``}${
-    nj.length > 0 ? `\n${nj}` : ``
-  }`;
+  const msg = `${
+    left.length > 0
+      ? `${user.username} left  ${left} ${
+          isOffline ? `because the person went offline` : ``
+        }`
+      : ``
+  }${nj.length > 0 ? `\n${nj}` : ``}`;
 
   return msg || `There are no pugs to leave`;
 };

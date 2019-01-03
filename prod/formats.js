@@ -126,7 +126,7 @@ var printPugJoinStatus = exports.printPugJoinStatus = function printPugJoinStatu
   return (joined.length > 0 ? user.username + ' joined :small_blue_diamond: ' + joined : '') + ' ' + (missed.length > 0 ? '\n' + missed : '') + ' ' + (aj.length > 0 ? '\n' + aj : '') + ' ' + (nf.length > 0 ? '\n' + nf : '');
 };
 
-var printPugLeaveStatus = exports.printPugLeaveStatus = function printPugLeaveStatus(statuses) {
+var printPugLeaveStatus = exports.printPugLeaveStatus = function printPugLeaveStatus(statuses, isOffline) {
   var _statuses$reduce2 = statuses.reduce(function (acc, _ref3) {
     var pug = _ref3.pug,
         user = _ref3.user,
@@ -142,7 +142,7 @@ var printPugLeaveStatus = exports.printPugLeaveStatus = function printPugLeaveSt
       nj = _statuses$reduce2.nj,
       user = _statuses$reduce2.user;
 
-  var msg = '' + (left.length > 0 ? user.username + ' left  ' + left : '') + (nj.length > 0 ? '\n' + nj : '');
+  var msg = '' + (left.length > 0 ? user.username + ' left  ' + left + ' ' + (isOffline ? 'because the person went offline' : '') : '') + (nj.length > 0 ? '\n' + nj : '');
 
   return msg || 'There are no pugs to leave';
 };

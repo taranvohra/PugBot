@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var prefix = exports.prefix = '~';
+var offline = exports.offline = '..adios..';
 
 var commands = exports.commands = {
   setchannel: ['setchannel'],

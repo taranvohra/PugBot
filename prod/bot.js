@@ -201,7 +201,7 @@ var onMessage = function () {
               return acc;
             }, []);
 
-            message.channel.send(_status ? (0, _formats.printPugLeaveStatus)(_result7) : _msg2).catch(console.error + ':leave:');
+            message.channel.send(_status ? (0, _formats.printPugLeaveStatus)(_result7, args[1] === _constants.offline) : _msg2).catch(console.error + ':leave:');
             deadPugs.length > 0 ? message.channel.send((0, _formats.broadCastDeadPugs)(deadPugs)) : null;
             return _context.abrupt('break', 87);
 
@@ -332,7 +332,7 @@ bot.on('presenceUpdate', function (_, _ref) {
         author: channeluser,
         attachments: new _map2.default(),
         embeds: [],
-        content: _constants.prefix + 'lva'
+        content: _constants.prefix + 'lva ' + _constants.offline
       }, bot);
       onMessage(message);
     }

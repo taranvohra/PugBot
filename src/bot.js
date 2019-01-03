@@ -1,7 +1,7 @@
-import { Client, Presence, Message, TextChannel, User } from 'discord.js';
+import { Client, Message, User } from 'discord.js';
 import dotenv from 'dotenv';
 import pugEventEmitter from './pugEvent';
-import { prefix, commands, pugEvents } from './constants';
+import { prefix, commands, pugEvents, offline } from './constants';
 import {
   addQueryServer,
   queryUT99Server,
@@ -70,7 +70,7 @@ bot.on(
             author: channeluser,
             attachments: new Map(),
             embeds: [],
-            content: `${prefix}lva`,
+            content: `${prefix}lva ${offline}`,
           },
           bot
         );
@@ -243,7 +243,7 @@ async function onMessage(message) {
         return acc;
       }, []);
       message.channel
-        .send(status ? printPugLeaveStatus(result) : msg)
+        .send(status ? printPugLeaveStatus(result, args[1] === offline) : msg)
         .catch(console.error + ':leave:');
       deadPugs.length > 0
         ? message.channel.send(broadCastDeadPugs(deadPugs))
