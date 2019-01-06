@@ -253,6 +253,42 @@ export const addCaptain = (user, PugList) => {
   }
 };
 
+export const listCurrentPickings = ([_, discriminator], Pugs, PugList) => {
+  try {
+    if (
+      discriminator &&
+      (!Pugs[discriminator] ||
+        (!PugList[discriminator] || !PugList[discriminator].picking))
+    )
+      return {
+        status: false,
+        result: {},
+        msg: !Pugs[discriminator]
+          ? `There is no such pug **${discriminator}**`
+          : PugList[discriminator] && !PugList[discriminator]['picking']
+          ? `**${discriminator}** is not in picking mode`
+          : `**${discriminator}** is not in picking mode`,
+      };
+
+    const pugs = PugList[discriminator]
+      ? [PugList[discriminator]]
+      : Object.values(PugList).reduce((acc, curr) => {
+          if (curr.picking) acc.push(curr);
+          return acc;
+        }, []);
+
+    const result = { pugs };
+    return {
+      status: pugs.length,
+      msg: pugs.length ? `` : `There are no active pugs`,
+      result,
+    };
+  } catch (error) {
+    console.log(error);
+    return { status: false, msg: 'Something went wrong' };
+  }
+};
+
 export class Pug {
   constructor({ discriminator, gameName, noPlayers, noTeams, pickingOrder }) {
     this.discriminator = discriminator;

@@ -15,6 +15,7 @@ export const commands = {
   listgametype: ['lsa', 'ls', 'list'],
   pickplayer: ['p', 'pick', 'adminpick'],
   captain: ['captain'],
+  picking: ['picking'],
   admincmds: ['adminadd', 'adminpick', 'adminremove'],
 };
 

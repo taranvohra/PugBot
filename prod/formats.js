@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.printAddCaptainStatus = exports.printPickStatus = exports.broadCastCaptainsReady = exports.broadCastDeadPugs = exports.broadCastFilledPugs = exports.printPugStatuses = exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printServerList = exports.printServerStatus = undefined;
+exports.printPickingPugsStatus = exports.printAddCaptainStatus = exports.printPickStatus = exports.broadCastCaptainsReady = exports.broadCastDeadPugs = exports.broadCastFilledPugs = exports.printPugStatuses = exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printServerList = exports.printServerStatus = undefined;
 
 var _values = require('babel-runtime/core-js/object/values');
 
@@ -234,6 +234,7 @@ var printPickStatus = exports.printPickStatus = function printPickStatus(_ref6) 
     return acc;
   }, 'Players: ');
 
+  // This is object based
   var currTeams = [].concat((0, _toConsumableArray3.default)(pug.list)).sort(function (a, b) {
     return a.pick - b.pick;
   }).reduce(function (acc, curr) {
@@ -241,6 +242,7 @@ var printPickStatus = exports.printPickStatus = function printPickStatus(_ref6) 
     return acc;
   }, pugTeams);
 
+  // This is taking that object based and appending all to a string
   var activeTeams = (0, _values2.default)(currTeams).reduce(function (acc, curr) {
     acc += curr + '\n';
     return acc;
@@ -254,5 +256,38 @@ var printAddCaptainStatus = exports.printAddCaptainStatus = function printAddCap
       team = _ref7.team;
 
   return '**' + user.username + '** became captain for **' + _constants.teams['team_' + team].toUpperCase() + '**';
+};
+
+var printPickingPugsStatus = exports.printPickingPugsStatus = function printPickingPugsStatus(pugs) {
+  return pugs.reduce(function (acc, pug) {
+    var next = pug.captains[pug.pickingOrder[pug.turn]];
+    var turn = '<@' + next.id + '> pick one for **' + _constants.teams['team_' + next.team] + '**';
+    var pugTeams = Array(pug.noTeams).fill(0).reduce(function (acc, curr, i) {
+      acc[i] = '**' + _constants.teams['team_' + i] + '**: ';
+      return acc;
+    }, {});
+
+    var players = pug.list.reduce(function (acc, curr, index) {
+      if (curr.team === null) acc += '**' + (index + 1) + '**) *' + curr.username + '*  ';
+      return acc;
+    }, 'Players: ');
+
+    // This is object based
+    var currTeams = [].concat((0, _toConsumableArray3.default)(pug.list)).sort(function (a, b) {
+      return a.pick - b.pick;
+    }).reduce(function (acc, curr) {
+      if (curr.team !== null) acc[curr.team] += '*' + curr.username + '*  ';
+      return acc;
+    }, pugTeams);
+
+    // This is taking that object based and appending all to a string
+    var activeTeams = (0, _values2.default)(currTeams).reduce(function (acc, curr) {
+      acc += curr + '\n';
+      return acc;
+    }, '');
+
+    acc += turn + '\n' + players + '\n\n' + activeTeams + '\n\n';
+    return acc;
+  }, '');
 };
 //# sourceMappingURL=formats.js.map

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Pug = exports.addCaptain = exports.pickPugPlayer = exports.listAvailablePugs = exports.leaveGameType = exports.joinGameType = exports.delGameType = exports.addGameType = undefined;
+exports.Pug = exports.listCurrentPickings = exports.addCaptain = exports.pickPugPlayer = exports.listAvailablePugs = exports.leaveGameType = exports.joinGameType = exports.delGameType = exports.addGameType = undefined;
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
@@ -399,13 +399,42 @@ var addCaptain = exports.addCaptain = function addCaptain(user, PugList) {
   }
 };
 
+var listCurrentPickings = exports.listCurrentPickings = function listCurrentPickings(_ref15, Pugs, PugList) {
+  var _ref16 = (0, _slicedToArray3.default)(_ref15, 2),
+      _ = _ref16[0],
+      discriminator = _ref16[1];
+
+  try {
+    if (discriminator && (!Pugs[discriminator] || !PugList[discriminator] || !PugList[discriminator].picking)) return {
+      status: false,
+      result: {},
+      msg: !Pugs[discriminator] ? 'There is no such pug **' + discriminator + '**' : PugList[discriminator] && !PugList[discriminator]['picking'] ? '**' + discriminator + '** is not in picking mode' : '**' + discriminator + '** is not in picking mode'
+    };
+
+    var pugs = PugList[discriminator] ? [PugList[discriminator]] : (0, _values2.default)(PugList).reduce(function (acc, curr) {
+      if (curr.picking) acc.push(curr);
+      return acc;
+    }, []);
+
+    var result = { pugs: pugs };
+    return {
+      status: pugs.length,
+      msg: pugs.length ? '' : 'There are no active pugs',
+      result: result
+    };
+  } catch (error) {
+    console.log(error);
+    return { status: false, msg: 'Something went wrong' };
+  }
+};
+
 var Pug = exports.Pug = function () {
-  function Pug(_ref15) {
-    var discriminator = _ref15.discriminator,
-        gameName = _ref15.gameName,
-        noPlayers = _ref15.noPlayers,
-        noTeams = _ref15.noTeams,
-        pickingOrder = _ref15.pickingOrder;
+  function Pug(_ref17) {
+    var discriminator = _ref17.discriminator,
+        gameName = _ref17.gameName,
+        noPlayers = _ref17.noPlayers,
+        noTeams = _ref17.noTeams,
+        pickingOrder = _ref17.pickingOrder;
     (0, _classCallCheck3.default)(this, Pug);
 
     this.discriminator = discriminator;

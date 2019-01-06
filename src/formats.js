@@ -243,6 +243,7 @@ export const printPickStatus = ({ pug, pickedPlayers, picking }) => {
     return acc;
   }, `Players: `);
 
+  // This is object based
   const currTeams = [...pug.list]
     .sort((a, b) => a.pick - b.pick)
     .reduce((acc, curr) => {
@@ -250,6 +251,7 @@ export const printPickStatus = ({ pug, pickedPlayers, picking }) => {
       return acc;
     }, pugTeams);
 
+  // This is taking that object based and appending all to a string
   const activeTeams = Object.values(currTeams).reduce((acc, curr) => {
     acc += `${curr}\n`;
     return acc;
@@ -262,4 +264,39 @@ export const printAddCaptainStatus = (user, { pug, team }) => {
   return `**${user.username}** became captain for **${teams[
     `team_${team}`
   ].toUpperCase()}**`;
+};
+
+export const printPickingPugsStatus = pugs => {
+  return pugs.reduce((acc, pug) => {
+    const next = pug.captains[pug.pickingOrder[pug.turn]];
+    const turn = `<@${next.id}> pick one for **${teams[`team_${next.team}`]}**`;
+    const pugTeams = Array(pug.noTeams)
+      .fill(0)
+      .reduce((acc, curr, i) => {
+        acc[i] = `**${teams[`team_${i}`]}**: `;
+        return acc;
+      }, {});
+
+    const players = pug.list.reduce((acc, curr, index) => {
+      if (curr.team === null) acc += `**${index + 1}**) *${curr.username}*  `;
+      return acc;
+    }, `Players: `);
+
+    // This is object based
+    const currTeams = [...pug.list]
+      .sort((a, b) => a.pick - b.pick)
+      .reduce((acc, curr) => {
+        if (curr.team !== null) acc[curr.team] += `*${curr.username}*  `;
+        return acc;
+      }, pugTeams);
+
+    // This is taking that object based and appending all to a string
+    const activeTeams = Object.values(currTeams).reduce((acc, curr) => {
+      acc += `${curr}\n`;
+      return acc;
+    }, ``);
+
+    acc += `${turn}\n\n${players}\n\n${activeTeams}\n\n`;
+    return acc;
+  }, ``);
 };

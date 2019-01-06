@@ -16,6 +16,7 @@ import {
   listAvailablePugs,
   pickPugPlayer,
   addCaptain,
+  listCurrentPickings,
 } from './pug';
 import {
   printServerStatus,
@@ -28,6 +29,7 @@ import {
   broadCastCaptainsReady,
   printPickStatus,
   printAddCaptainStatus,
+  printPickingPugsStatus,
 } from './formats';
 import { checkIfRoleIsPrivileged, fixSpecialCharactersInName } from './helpers';
 import { createSortedArrayFromObject } from './util';
@@ -300,6 +302,12 @@ async function onMessage(message) {
             result.pug.discriminator
           )
         : null;
+      break;
+    }
+
+    case commands.picking.includes(action): {
+      const { status, result, msg } = listCurrentPickings(args, Pugs, PugList);
+      message.channel.send(status ? printPickingPugsStatus(result.pugs) : msg);
       break;
     }
 
