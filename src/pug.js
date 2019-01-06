@@ -280,13 +280,36 @@ export const listCurrentPickings = ([_, discriminator], Pugs, PugList) => {
     const result = { pugs };
     return {
       status: pugs.length,
-      msg: pugs.length ? `` : `There are no active pugs`,
+      msg: pugs.length ? `` : `There are no pugs in picking mode`,
       result,
     };
   } catch (error) {
     console.log(error);
     return { status: false, msg: 'Something went wrong' };
   }
+};
+
+export const promoteAvailablePugs = ([_, discriminator], PugList) => {
+  if (
+    discriminator &&
+    (!PugList[discriminator] ||
+      PugList[discriminator].picking ||
+      PugList[discriminator].list.length === 0)
+  )
+    return { status: false, result: {}, msg: `` };
+
+  const pugs = PugList[discriminator]
+    ? [PugList[discriminator]]
+    : Object.values(PugList).reduce((acc, curr) => {
+        if (curr.list.length < curr.noPlayers) acc.push(curr);
+        return acc;
+      }, []);
+  const result = { pugs };
+  return {
+    status: pugs.length,
+    msg: ``,
+    result,
+  };
 };
 
 export class Pug {

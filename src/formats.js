@@ -300,3 +300,12 @@ export const printPickingPugsStatus = pugs => {
     return acc;
   }, ``);
 };
+
+export const printPromoteStatus = pugs => {
+  return pugs.reduce((acc, curr) => {
+    acc += `**${curr.noPlayers -
+      curr.list
+        .length}** more needed for **${curr.discriminator.toUpperCase()}** \n`;
+    return acc;
+  }, `@here \n`);
+};

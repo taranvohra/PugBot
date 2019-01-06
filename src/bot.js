@@ -17,6 +17,7 @@ import {
   pickPugPlayer,
   addCaptain,
   listCurrentPickings,
+  promoteAvailablePugs,
 } from './pug';
 import {
   printServerStatus,
@@ -30,6 +31,7 @@ import {
   printPickStatus,
   printAddCaptainStatus,
   printPickingPugsStatus,
+  printPromoteStatus,
 } from './formats';
 import { checkIfRoleIsPrivileged, fixSpecialCharactersInName } from './helpers';
 import { createSortedArrayFromObject } from './util';
@@ -308,6 +310,12 @@ async function onMessage(message) {
     case commands.picking.includes(action): {
       const { status, result, msg } = listCurrentPickings(args, Pugs, PugList);
       message.channel.send(status ? printPickingPugsStatus(result.pugs) : msg);
+      break;
+    }
+
+    case commands.promote.includes(action): {
+      const { status, result, msg } = promoteAvailablePugs(args, PugList);
+      status ? message.channel.send(printPromoteStatus(result.pugs)) : null;
       break;
     }
 

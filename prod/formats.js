@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.printPickingPugsStatus = exports.printAddCaptainStatus = exports.printPickStatus = exports.broadCastCaptainsReady = exports.broadCastDeadPugs = exports.broadCastFilledPugs = exports.printPugStatuses = exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printServerList = exports.printServerStatus = undefined;
+exports.printPromoteStatus = exports.printPickingPugsStatus = exports.printAddCaptainStatus = exports.printPickStatus = exports.broadCastCaptainsReady = exports.broadCastDeadPugs = exports.broadCastFilledPugs = exports.printPugStatuses = exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printServerList = exports.printServerStatus = undefined;
 
 var _values = require('babel-runtime/core-js/object/values');
 
@@ -286,8 +286,15 @@ var printPickingPugsStatus = exports.printPickingPugsStatus = function printPick
       return acc;
     }, '');
 
-    acc += turn + '\n' + players + '\n\n' + activeTeams + '\n\n';
+    acc += turn + '\n\n' + players + '\n\n' + activeTeams + '\n\n';
     return acc;
   }, '');
+};
+
+var printPromoteStatus = exports.printPromoteStatus = function printPromoteStatus(pugs) {
+  return pugs.reduce(function (acc, curr) {
+    acc += '**' + (curr.noPlayers - curr.list.length) + '** more needed for **' + curr.discriminator.toUpperCase() + '** \n';
+    return acc;
+  }, '@here \n');
 };
 //# sourceMappingURL=formats.js.map

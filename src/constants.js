@@ -16,6 +16,7 @@ export const commands = {
   pickplayer: ['p', 'pick', 'adminpick'],
   captain: ['captain'],
   picking: ['picking'],
+  promote: ['promote'],
   admincmds: ['adminadd', 'adminpick', 'adminremove'],
 };
 
