@@ -56,7 +56,7 @@ var onMessage = function () {
             };
             roles = message.member.roles;
             args = message.content.substring(_constants.prefix.length).split(' ').filter(Boolean);
-            action = args[0].toLowerCase();
+            action = args[0] ? args[0].toLowerCase() : null;
             hasAdminCmd = _constants.commands.admincmds.includes(action);
             isValidAdminCmd = hasAdminCmd && (0, _helpers.checkIfRoleIsPrivileged)(roles);
             _context.t0 = true;

@@ -3,8 +3,9 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var prefix = exports.prefix = '~';
+var prefix = exports.prefix = '-';
 var offline = exports.offline = '..adios..';
+var captainTimeout = exports.captainTimeout = 15000;
 
 var commands = exports.commands = {
   setchannel: ['setchannel'],

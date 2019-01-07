@@ -109,7 +109,7 @@ async function onMessage(message) {
     .substring(prefix.length)
     .split(' ')
     .filter(Boolean);
-  const action = args[0].toLowerCase();
+  const action = args[0] ? args[0].toLowerCase() : null;
 
   const hasAdminCmd = commands.admincmds.includes(action);
   const isValidAdminCmd = hasAdminCmd && checkIfRoleIsPrivileged(roles);

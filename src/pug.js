@@ -2,7 +2,7 @@ import API from './api';
 import { getPickingOrder } from './helpers';
 import cloneDeep from 'lodash/cloneDeep';
 import { getRandomInt } from './util';
-import { pugEvents } from './constants';
+import { pugEvents, prefix, captainTimeout } from './constants';
 import pugEventEmitter from './pugEvent';
 
 export const addGameType = async (
@@ -36,7 +36,7 @@ export const addGameType = async (
     const result = await API.pushToDB('/Pugs', discriminator, newGameType);
     return { ...result, msg: 'Gametype added' };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: false, msg: 'Something went wrong' };
   }
 };
@@ -50,7 +50,7 @@ export const delGameType = async ([_, discriminator, ...args], Pugs) => {
     const result = await API.deleteFromDB('/Pugs', discriminator);
     return { ...result, msg: 'Gametype removed' };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: false, msg: 'Something went wrong' };
   }
 };
@@ -95,7 +95,7 @@ export const joinGameType = ([_, ...args], user, Pugs, PugList) => {
     });
     return { status: true, result };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: false, msg: 'Something went wrong' };
   }
 };
@@ -138,7 +138,7 @@ export const leaveGameType = ([action, ...args], user, Pugs, PugList) => {
       return { status: true, result };
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: false, msg: 'Something went wrong' };
   }
 };
@@ -182,7 +182,7 @@ export const listAvailablePugs = ([action, forGame, ...args], PugList) => {
       return { status: true, result };
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: false, msg: 'Something went wrong' };
   }
 };
@@ -228,7 +228,7 @@ export const pickPugPlayer = ([_, playerIndex], user, PugList) => {
     const result = { pug, ...res };
     return { status: result.picked, result };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: false, msg: 'Something went wrong' };
   }
 };
@@ -248,7 +248,7 @@ export const addCaptain = (user, PugList) => {
     const result = { pug, ...res };
     return { status: result.captained, result };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: false, msg: 'Something went wrong' };
   }
 };
@@ -270,12 +270,16 @@ export const listCurrentPickings = ([_, discriminator], Pugs, PugList) => {
           : `**${discriminator}** is not in picking mode`,
       };
 
-    const pugs = PugList[discriminator]
-      ? [PugList[discriminator]]
-      : Object.values(PugList).reduce((acc, curr) => {
-          if (curr.picking) acc.push(curr);
-          return acc;
-        }, []);
+    const filtering = PugList[discriminator] ? discriminator : 'all';
+    const pugs = Object.values(PugList).reduce((acc, curr) => {
+      if (
+        (curr.discriminator === filtering || filtering === 'all') &&
+        curr.picking &&
+        curr.captains.length === curr.noTeams
+      )
+        acc.push(curr);
+      return acc;
+    }, []);
 
     const result = { pugs };
     return {
@@ -284,7 +288,7 @@ export const listCurrentPickings = ([_, discriminator], Pugs, PugList) => {
       result,
     };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: false, msg: 'Something went wrong' };
   }
 };
@@ -347,13 +351,10 @@ export class Pug {
         }
       }
       pugEventEmitter.emit(pugEvents.captainsReady, this.discriminator);
-    }, 15000);
+    }, captainTimeout);
   }
 
   stopPug() {
-    this.picking = false;
-    this.turn = 0;
-    this.list.forEach(user => (user.captain = user.team = user.pick = null));
     this.cleanup();
   }
 
@@ -428,6 +429,9 @@ export class Pug {
 
   cleanup() {
     this.picking = false;
+    this.turn = 0;
+    this.captains = [];
+    this.list.forEach(user => (user.captain = user.team = user.pick = null));
     clearTimeout(this.captainTimer);
   }
 }

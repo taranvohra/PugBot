@@ -6,7 +6,7 @@ import {
   getTeamScores,
   getTeamIndex,
 } from './helpers';
-import { teams } from './constants';
+import { teams, prefix } from './constants';
 
 export const printServerStatus = ({ info, players }) => {
   let richEmbed = new Discord.RichEmbed();
@@ -184,7 +184,7 @@ export const broadCastFilledPugs = filledPugs => {
       prev += `<@${player.id}> `;
       return prev;
     }, ``);
-    const footer = `Type \`.captain\` to become a captain. Random capts will be picked in 30 seconds`;
+    const footer = `Type \`${prefix}captain\` to become a captain. Random capts will be picked in 30 seconds`;
     acc += `${title}\n${body}\n${footer}\n`;
     return acc;
   }, ``);

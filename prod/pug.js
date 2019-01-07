@@ -123,7 +123,7 @@ var addGameType = exports.addGameType = function () {
             _context.prev = 16;
             _context.t0 = _context['catch'](0);
 
-            console.log(_context.t0);
+            console.error(_context.t0);
             return _context.abrupt('return', { status: false, msg: 'Something went wrong' });
 
           case 20:
@@ -172,7 +172,7 @@ var delGameType = exports.delGameType = function () {
             _context2.prev = 9;
             _context2.t0 = _context2['catch'](0);
 
-            console.log(_context2.t0);
+            console.error(_context2.t0);
             return _context2.abrupt('return', { status: false, msg: 'Something went wrong' });
 
           case 13:
@@ -231,7 +231,7 @@ var joinGameType = exports.joinGameType = function joinGameType(_ref7, user, Pug
     });
     return { status: true, result: result };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: false, msg: 'Something went wrong' };
   }
 };
@@ -277,7 +277,7 @@ var leaveGameType = exports.leaveGameType = function leaveGameType(_ref9, user, 
       return { status: true, result: _result };
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: false, msg: 'Something went wrong' };
   }
 };
@@ -328,7 +328,7 @@ var listAvailablePugs = exports.listAvailablePugs = function listAvailablePugs(_
       return { status: true, result: _result2 };
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: false, msg: 'Something went wrong' };
   }
 };
@@ -372,7 +372,7 @@ var pickPugPlayer = exports.pickPugPlayer = function pickPugPlayer(_ref13, user,
     var result = (0, _extends3.default)({ pug: pug }, res);
     return { status: result.picked, result: result };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: false, msg: 'Something went wrong' };
   }
 };
@@ -394,7 +394,7 @@ var addCaptain = exports.addCaptain = function addCaptain(user, PugList) {
     var result = (0, _extends3.default)({ pug: pug }, res);
     return { status: result.captained, result: result };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: false, msg: 'Something went wrong' };
   }
 };
@@ -411,8 +411,9 @@ var listCurrentPickings = exports.listCurrentPickings = function listCurrentPick
       msg: !Pugs[discriminator] ? 'There is no such pug **' + discriminator + '**' : PugList[discriminator] && !PugList[discriminator]['picking'] ? '**' + discriminator + '** is not in picking mode' : '**' + discriminator + '** is not in picking mode'
     };
 
-    var pugs = PugList[discriminator] ? [PugList[discriminator]] : (0, _values2.default)(PugList).reduce(function (acc, curr) {
-      if (curr.picking) acc.push(curr);
+    var filtering = PugList[discriminator] ? discriminator : 'all';
+    var pugs = (0, _values2.default)(PugList).reduce(function (acc, curr) {
+      if ((curr.discriminator === filtering || filtering === 'all') && curr.picking && curr.captains.length === curr.noTeams) acc.push(curr);
       return acc;
     }, []);
 
@@ -423,7 +424,7 @@ var listCurrentPickings = exports.listCurrentPickings = function listCurrentPick
       result: result
     };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: false, msg: 'Something went wrong' };
   }
 };
@@ -493,16 +494,11 @@ var Pug = exports.Pug = function () {
           }
         }
         _pugEvent2.default.emit(_constants.pugEvents.captainsReady, _this.discriminator);
-      }, 15000);
+      }, _constants.captainTimeout);
     }
   }, {
     key: 'stopPug',
     value: function stopPug() {
-      this.picking = false;
-      this.turn = 0;
-      this.list.forEach(function (user) {
-        return user.captain = user.team = user.pick = null;
-      });
       this.cleanup();
     }
   }, {
@@ -590,6 +586,11 @@ var Pug = exports.Pug = function () {
     key: 'cleanup',
     value: function cleanup() {
       this.picking = false;
+      this.turn = 0;
+      this.captains = [];
+      this.list.forEach(function (user) {
+        return user.captain = user.team = user.pick = null;
+      });
       clearTimeout(this.captainTimer);
     }
   }]);
