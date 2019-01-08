@@ -179,7 +179,7 @@ var broadCastFilledPugs = exports.broadCastFilledPugs = function broadCastFilled
       prev += '<@' + player.id + '> ';
       return prev;
     }, '');
-    var footer = 'Type `' + _constants.prefix + 'captain` to become a captain. Random capts will be picked in 30 seconds';
+    var footer = 'Type `' + _constants.prefix + 'captain` to become a captain. Random capts will be picked in ' + _constants.captainTimeout / 1000 + ' seconds';
     acc += title + '\n' + body + '\n' + footer + '\n';
     return acc;
   }, '');
