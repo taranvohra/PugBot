@@ -380,14 +380,19 @@ var pickPugPlayer = exports.pickPugPlayer = function pickPugPlayer(_ref13, user,
 var addCaptain = exports.addCaptain = function addCaptain(user, PugList) {
   try {
     var _Object$values$filter = (0, _values2.default)(PugList).filter(function (p) {
-      return p.picking && p.captains.length !== p.noTeams && p.list.some(function (u) {
-        return u.id === user.id && u.captain === null;
-      });
+      return p.picking && p.captains.length !== p.noTeams;
     }),
         _Object$values$filter2 = (0, _slicedToArray3.default)(_Object$values$filter, 1),
         activePug = _Object$values$filter2[0];
 
     if (!activePug) return { status: false, msg: 'Invalid' };
+    if (!activePug.list.some(function (u) {
+      return u.id === user.id && u.captain === null;
+    })) return {
+      status: false,
+      msg: '**' + user.username + '** is already a captain'
+    };
+
     var pug = activePug;
     // Not cloning here because of timeout
     var res = pug.addCaptain(user);
@@ -485,12 +490,8 @@ var Pug = exports.Pug = function () {
           if (present[i]) continue;
           while (1) {
             var pIndex = (0, _util.getRandomInt)(0, _this.noPlayers - 1);
-            if (_this.list[pIndex]['captain'] === null) {
-              _this.list[pIndex]['captain'] = _this.list[pIndex]['team'] = i;
-              _this.list[pIndex]['pick'] = 0;
-              _this.captains.push(_this.list[pIndex]);
-              break;
-            }
+            var isSpotFilled = _this.fillCaptainSpot(pIndex, i);
+            if (isSpotFilled) break;
           }
         }
         _pugEvent2.default.emit(_constants.pugEvents.captainsReady, _this.discriminator);
@@ -505,9 +506,7 @@ var Pug = exports.Pug = function () {
     key: 'addPlayer',
     value: function addPlayer(user) {
       if (!this.picking) {
-        if (this.list.findIndex(function (u) {
-          return u.id === user.id;
-        }) > -1) return 2;
+        if (this.findPlayer(user) > -1) return 2;
         this.list.push((0, _extends3.default)({ team: null, captain: null, pick: null }, user));
         this.list.length === this.noPlayers ? this.fillPug() : null;
         return 1;
@@ -521,22 +520,33 @@ var Pug = exports.Pug = function () {
       if (this.picking) this.stopPug();
     }
   }, {
+    key: 'fillCaptainSpot',
+    value: function fillCaptainSpot(playerIndex, team) {
+      if (this.list[playerIndex]['captain'] === null && !this.captains[team]) {
+        this.list[playerIndex]['captain'] = this.list[playerIndex]['team'] = team;
+        this.list[playerIndex]['pick'] = 0;
+        this.captains[team] = this.list[playerIndex];
+        return true;
+      }
+      return false;
+    }
+  }, {
     key: 'addCaptain',
     value: function addCaptain(user) {
-      var pIndex = this.list.findIndex(function (u) {
-        return u.id === user.id;
-      });
+      var pIndex = this.findPlayer(user);
       if (pIndex > -1) {
-        var length = this.captains.push(this.list[pIndex]);
-        this.list[pIndex]['captain'] = this.list[pIndex]['team'] = length - 1;
-        this.list[pIndex]['pick'] = 0;
+        while (1) {
+          var teamIndex = (0, _util.getRandomInt)(0, this.noTeams - 1);
+          var isSpotFilled = this.fillCaptainSpot(pIndex, teamIndex);
+          if (isSpotFilled) break;
+        }
 
-        if (this.captains.length === this.noTeams) clearTimeout(this.captainTimer);
+        if (this.findIfCaptainsFilled()) clearTimeout(this.captainTimer);
 
         return {
           captained: true,
-          team: length - 1,
-          captainsReady: this.captains.length === this.noTeams
+          team: this.list[pIndex]['team'],
+          captainsReady: this.findIfCaptainsFilled()
         };
       }
       return { captained: false };
@@ -581,6 +591,11 @@ var Pug = exports.Pug = function () {
       return this.list.findIndex(function (u) {
         return u.id === user.id;
       });
+    }
+  }, {
+    key: 'findIfCaptainsFilled',
+    value: function findIfCaptainsFilled() {
+      return this.captains.filter(Boolean).length === this.noTeams;
     }
   }, {
     key: 'cleanup',

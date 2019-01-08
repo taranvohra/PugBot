@@ -236,12 +236,16 @@ export const pickPugPlayer = ([_, playerIndex], user, PugList) => {
 export const addCaptain = (user, PugList) => {
   try {
     const [activePug] = Object.values(PugList).filter(
-      p =>
-        p.picking &&
-        p.captains.length !== p.noTeams &&
-        p.list.some(u => u.id === user.id && u.captain === null)
+      p => p.picking && p.captains.length !== p.noTeams
     );
+
     if (!activePug) return { status: false, msg: `Invalid` };
+    if (!activePug.list.some(u => u.id === user.id && u.captain === null))
+      return {
+        status: false,
+        msg: `**${user.username}** is already a captain`,
+      };
+
     const pug = activePug;
     // Not cloning here because of timeout
     const res = pug.addCaptain(user);
@@ -342,12 +346,8 @@ export class Pug {
         if (present[i]) continue;
         while (1) {
           const pIndex = getRandomInt(0, this.noPlayers - 1);
-          if (this.list[pIndex]['captain'] === null) {
-            this.list[pIndex]['captain'] = this.list[pIndex]['team'] = i;
-            this.list[pIndex]['pick'] = 0;
-            this.captains.push(this.list[pIndex]);
-            break;
-          }
+          const isSpotFilled = this.fillCaptainSpot(pIndex, i);
+          if (isSpotFilled) break;
         }
       }
       pugEventEmitter.emit(pugEvents.captainsReady, this.discriminator);
@@ -360,7 +360,7 @@ export class Pug {
 
   addPlayer(user) {
     if (!this.picking) {
-      if (this.list.findIndex(u => u.id === user.id) > -1) return 2;
+      if (this.findPlayer(user) > -1) return 2;
       this.list.push({ team: null, captain: null, pick: null, ...user });
       this.list.length === this.noPlayers ? this.fillPug() : null;
       return 1;
@@ -373,20 +373,31 @@ export class Pug {
     if (this.picking) this.stopPug();
   }
 
-  addCaptain(user) {
-    const pIndex = this.list.findIndex(u => u.id === user.id);
-    if (pIndex > -1) {
-      const length = this.captains.push(this.list[pIndex]);
-      this.list[pIndex]['captain'] = this.list[pIndex]['team'] = length - 1;
-      this.list[pIndex]['pick'] = 0;
+  fillCaptainSpot(playerIndex, team) {
+    if (this.list[playerIndex]['captain'] === null && !this.captains[team]) {
+      this.list[playerIndex]['captain'] = this.list[playerIndex]['team'] = team;
+      this.list[playerIndex]['pick'] = 0;
+      this.captains[team] = this.list[playerIndex];
+      return true;
+    }
+    return false;
+  }
 
-      if (this.captains.length === this.noTeams)
-        clearTimeout(this.captainTimer);
+  addCaptain(user) {
+    const pIndex = this.findPlayer(user);
+    if (pIndex > -1) {
+      while (1) {
+        const teamIndex = getRandomInt(0, this.noTeams - 1);
+        const isSpotFilled = this.fillCaptainSpot(pIndex, teamIndex);
+        if (isSpotFilled) break;
+      }
+
+      if (this.findIfCaptainsFilled()) clearTimeout(this.captainTimer);
 
       return {
         captained: true,
-        team: length - 1,
-        captainsReady: this.captains.length === this.noTeams,
+        team: this.list[pIndex]['team'],
+        captainsReady: this.findIfCaptainsFilled(),
       };
     }
     return { captained: false };
@@ -425,6 +436,10 @@ export class Pug {
 
   findPlayer(user) {
     return this.list.findIndex(u => u.id === user.id);
+  }
+
+  findIfCaptainsFilled() {
+    return this.captains.filter(Boolean).length === this.noTeams;
   }
 
   cleanup() {
