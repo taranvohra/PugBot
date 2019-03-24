@@ -70,7 +70,7 @@ export const printServerStatus = ({ info, players }) => {
   return richEmbed;
 };
 
-export const printServerList = cachedDB => {
+export const printGameServersList = cachedDB => {
   let richEmbed = new Discord.RichEmbed();
 
   const { desc } = cachedDB.reduce(
@@ -85,7 +85,7 @@ export const printServerList = cachedDB => {
 
   richEmbed.setTitle(`IP\u00A0\u00A0\u00A0Name`);
   richEmbed.setColor('#838282');
-  richEmbed.setDescription(desc);
+  richEmbed.setDescription(desc || 'No game servers added yet');
   richEmbed.setFooter('To query, type .q ip');
   return richEmbed;
 };

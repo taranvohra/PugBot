@@ -1,4 +1,4 @@
-export const prefix = '-';
+export const prefix = '.';
 export const offline = '..adios..';
 export const captainTimeout = 15000;
 

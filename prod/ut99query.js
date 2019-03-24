@@ -42,7 +42,7 @@ var _helpers = require('./helpers');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var addQueryServer = exports.addQueryServer = function () {
-  var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(_ref, cachedDB) {
+  var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(_ref, serverId, cachedDB) {
     var _ref3 = (0, _toArray3.default)(_ref),
         _ = _ref3[0],
         hp = _ref3[1],
@@ -83,7 +83,7 @@ var addQueryServer = exports.addQueryServer = function () {
           case 8:
             newServer = { host: host, port: port, name: name, aliases: aliases, timestamp: Date.now() };
             _context.next = 11;
-            return _api2.default.pushToDB('/Servers', uid, newServer);
+            return _api2.default.pushToDB('/' + serverId + '/GameServers', uid, newServer);
 
           case 11:
             result = _context.sent;
@@ -104,13 +104,13 @@ var addQueryServer = exports.addQueryServer = function () {
     }, _callee, undefined, [[0, 15]]);
   }));
 
-  return function addQueryServer(_x, _x2) {
+  return function addQueryServer(_x, _x2, _x3) {
     return _ref2.apply(this, arguments);
   };
 }();
 
 var delQueryServer = exports.delQueryServer = function () {
-  var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(_ref4, cachedDB) {
+  var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(_ref4, serverId, cachedDB) {
     var _ref6 = (0, _toArray3.default)(_ref4),
         _ = _ref6[0],
         index = _ref6[1],
@@ -133,7 +133,7 @@ var delQueryServer = exports.delQueryServer = function () {
 
           case 4:
             _context2.next = 6;
-            return _api2.default.deleteFromDB('/Servers', uid);
+            return _api2.default.deleteFromDB('/' + serverId + '/GameServers', uid);
 
           case 6:
             result = _context2.sent;
@@ -154,7 +154,7 @@ var delQueryServer = exports.delQueryServer = function () {
     }, _callee2, undefined, [[0, 10]]);
   }));
 
-  return function delQueryServer(_x3, _x4) {
+  return function delQueryServer(_x4, _x5, _x6) {
     return _ref5.apply(this, arguments);
   };
 }();
@@ -220,7 +220,7 @@ var queryUT99Server = exports.queryUT99Server = function () {
     }, _callee3, undefined, [[3, 15]]);
   }));
 
-  return function queryUT99Server(_x5, _x6) {
+  return function queryUT99Server(_x7, _x8) {
     return _ref7.apply(this, arguments);
   };
 }();
@@ -255,7 +255,7 @@ var setPreferredChannel = exports.setPreferredChannel = function () {
     }, _callee4, undefined, [[0, 7]]);
   }));
 
-  return function setPreferredChannel(_x7) {
+  return function setPreferredChannel(_x9) {
     return _ref10.apply(this, arguments);
   };
 }();

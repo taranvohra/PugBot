@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.printPromoteStatus = exports.printPickingPugsStatus = exports.printAddCaptainStatus = exports.printPickStatus = exports.broadCastCaptainsReady = exports.broadCastDeadPugs = exports.broadCastFilledPugs = exports.printPugStatuses = exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printServerList = exports.printServerStatus = undefined;
+exports.printPromoteStatus = exports.printPickingPugsStatus = exports.printAddCaptainStatus = exports.printPickStatus = exports.broadCastCaptainsReady = exports.broadCastDeadPugs = exports.broadCastFilledPugs = exports.printPugStatuses = exports.printPugLeaveStatus = exports.printPugJoinStatus = exports.printGameServersList = exports.printServerStatus = undefined;
 
 var _values = require('babel-runtime/core-js/object/values');
 
@@ -72,7 +72,7 @@ var printServerStatus = exports.printServerStatus = function printServerStatus(_
   return richEmbed;
 };
 
-var printServerList = exports.printServerList = function printServerList(cachedDB) {
+var printGameServersList = exports.printGameServersList = function printGameServersList(cachedDB) {
   var richEmbed = new _discord2.default.RichEmbed();
 
   var _cachedDB$reduce = cachedDB.reduce(function (acc, curr, index) {
@@ -85,7 +85,7 @@ var printServerList = exports.printServerList = function printServerList(cachedD
 
   richEmbed.setTitle('IP\xA0\xA0\xA0Name');
   richEmbed.setColor('#838282');
-  richEmbed.setDescription(desc);
+  richEmbed.setDescription(desc || 'No game servers added yet');
   richEmbed.setFooter('To query, type .q ip');
   return richEmbed;
 };

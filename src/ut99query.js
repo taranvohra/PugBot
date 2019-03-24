@@ -7,7 +7,7 @@ import {
   getUIDFromIndex,
 } from './helpers';
 
-export const addQueryServer = async ([_, hp, ...args], cachedDB) => {
+export const addQueryServer = async ([_, hp, ...args], serverId, cachedDB) => {
   try {
     const [host, port] = hp.split(':');
     const { name, aliases } = args.reduce(
@@ -30,7 +30,11 @@ export const addQueryServer = async ([_, hp, ...args], cachedDB) => {
 
     const newServer = { host, port, name, aliases, timestamp: Date.now() };
 
-    const result = await API.pushToDB('/Servers', uid, newServer);
+    const result = await API.pushToDB(
+      `/${serverId}/GameServers`,
+      uid,
+      newServer
+    );
     return { ...result, msg: 'Query server added' };
   } catch (error) {
     console.log(error);
@@ -38,12 +42,16 @@ export const addQueryServer = async ([_, hp, ...args], cachedDB) => {
   }
 };
 
-export const delQueryServer = async ([_, index, ...args], cachedDB) => {
+export const delQueryServer = async (
+  [_, index, ...args],
+  serverId,
+  cachedDB
+) => {
   try {
     const uid = getUIDFromIndex(cachedDB, parseInt(index));
     if (!uid) return { status: false, msg: `Query server doesn't exist` };
 
-    const result = await API.deleteFromDB('/Servers', uid);
+    const result = await API.deleteFromDB(`/${serverId}/GameServers`, uid);
     return { ...result, msg: 'Query server removed' };
   } catch (error) {
     console.log(error);
