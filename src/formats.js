@@ -64,7 +64,7 @@ export const printServerStatus = ({ info, players }) => {
   const footerText = `unreal://${info.host}:${info.port}`;
 
   richEmbed.setTitle(info.hostname);
-  richEmbed.setColor('#838282');
+  richEmbed.setColor('#F1A5AB');
   richEmbed.setDescription(desc);
   richEmbed.setFooter(footerText);
   return richEmbed;
@@ -84,7 +84,7 @@ export const printGameServersList = cachedDB => {
   );
 
   richEmbed.setTitle(`IP\u00A0\u00A0\u00A0Name`);
-  richEmbed.setColor('#838282');
+  richEmbed.setColor('#F1A5AB');
   richEmbed.setDescription(desc || 'No game servers added yet');
   richEmbed.setFooter('To query, type .q ip');
   return richEmbed;
